@@ -1,18 +1,3 @@
-/*
-•❅──────✧✦✧──────❅•
-Codigo Creado Por CUERVO-TEAM-SUPREME
-Para Elymas-Bot Este Codigo Es 
-Exclusivo Y Unico Para Este Bot Al 
-Clonar O Copiar Dejar Estos Creditos 
-De Cuervo-Team-Supreme
-━━━━━ ☾☽ ━━━━━
-ʚĭɞ ೃ CODIGO JAVASCRIPT ʚĭɞ ೃ
-ʚĭɞ ೃ codigo :: plugins/general/menu.js
-ʚĭɞ ೃ funcion :: menu dinamico con lectura automatica de plugins e imagenes/videos
-ʚĭɞ ೃ estado :: completo
-──────✧✦✧──────
-*/
-
 import fs from 'fs'
 import path from 'path'
 import config from '../../config.js'
@@ -20,16 +5,7 @@ import { getSubbotConfig } from '../../lib/subbotconfig.js'
 
 function getCategoryIcon(category) {
     const icons = {
-        'general': '⚙️',
-        'convertidores': '🖼️',
-        'descargas': '📥',
-        'grupos': '👥',
-        'subbots': '🤖',
-        'owner': '👑',
-        'economia': '💰',
-        'juegos': '🎮',
-        'herramientas': '🛠️',
-        'nsfw': '🔞'
+        'general': '⚙️'
     }
     return icons[category.toLowerCase()] || '📁'
 }
@@ -42,8 +18,8 @@ export default {
         const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
         const botData = getSubbotConfig(rawJid, config)
 
-        const botName = botData.name || config.botName || 'Cuervo'
-        const ownerName = botData.ownerName || config.ownerName || 'TheDevil'
+        const botName = botData.name || config.botName || 'F I X X E D ボ'
+        const ownerName = botData.ownerName || config.ownerName || 'TewIanIx'
         
         // Obtenemos la media guardada (o fallback a la propiedad image antigua)
         const mediaUrl = botData.mediaUrl || botData.image
@@ -87,15 +63,9 @@ export default {
             console.error('Error al leer el directorio de plugins:', e)
         }
 
-        let menuText = `╭━━━━━━━━━━━━━━━━━━╮\n`
-        menuText += `┃ *${botName.toUpperCase()}*\n`
-        menuText += `╰━━━━━━━━━━━━━━━━━━╯\n\n`
-        menuText += `👋 Hola, *${nombre}*\n\n`
-        menuText += `╭─〔 🤖 INFORMACIÓN 〕\n`
-        menuText += `│ ⚡ Bot: ${botName}\n`
-        menuText += `│ 👑 Owner: ${ownerName}\n`
-        menuText += `│ 🔧 Versión: ${config.version || '1.0.0'}\n`
-        menuText += `╰──────────────\n\n`
+        let menuText = `━━━━━━━━━━━━━━━━━━\n`
+        menuText += ` *${botName.toUpperCase()}*\n`
+        menuText += `Hola, *${nombre}*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
             if (commands.length === 0) continue
