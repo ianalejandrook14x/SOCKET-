@@ -1,18 +1,3 @@
-/*
-•❅──────✧✦✧──────❅•
-Codigo Creado Por CUERVO-TEAM-SUPREME
-Para Elymas-Bot Este Codigo Es 
-Exclusivo Y Unico Para Este Bot Al 
-Clonar O Copiar Dejar Estos Creditos 
-De Cuervo-Team-Supreme
-━━━━━ ☾☽ ━━━━━
-ʚĭɞ ೃ CODIGO JAVASCRIPT ʚĭɞ ೃ
-ʚĭɞ ೃ codigo :: index.js
-ʚĭɞ ೃ funcion :: inicio de bot e integracion de bienvenidas/despedidas
-ʚĭɞ ೃ estado :: completo
-──────✧✦✧──────
-*/
-
 import {
     makeWASocket,
     useMultiFileAuthState,
@@ -156,7 +141,7 @@ async function getPhoneNumber() {
         number =
             await question(
 
-                '\n📱 Ingresa el número de WhatsApp con código de país:\n> '
+                '\nEnter the number\n> '
 
             )
 
@@ -173,7 +158,7 @@ async function getPhoneNumber() {
         ) {
 
             console.log(
-                '❌ Número inválido.'
+                'Invalid number.'
             )
 
         }
@@ -196,12 +181,8 @@ async function startBot() {
 
     console.log(`
 
-╔══════════════════════════════════════╗
-║          🌱 CUERVO BOT               ║
-║                                      ║
-║        Iniciando bot principal       ║
-╚══════════════════════════════════════╝
-
+           F  I  X  X  E  D            
+ ══════════════════════════════════════ 
 `)
 
 
@@ -292,7 +273,7 @@ async function startBot() {
             ) {
 
                 console.log(
-                    '🔄 Conectando con WhatsApp...'
+                    'Connecting With WhatsApp'
                 )
 
             }
@@ -305,11 +286,8 @@ async function startBot() {
 
                 console.log(`
 
-╔══════════════════════════════════════╗
-║       ✅ BOT CONECTADO                ║
-║                                      ║
-║       🌱 ${config.botName}
-╚══════════════════════════════════════╝
+           FIXXED | CONNECTED
+ ══════════════════════════════════════
 
 `)
 
@@ -324,7 +302,7 @@ async function startBot() {
                     try {
 
                         console.log(
-                            '🤖 Cargando subbots guardados...'
+                            'Cargando Jadibots... DB'
                         )
 
 
@@ -332,7 +310,7 @@ async function startBot() {
 
 
                         console.log(
-                            '✅ Subbots cargados correctamente.'
+                            'Jadibots DB cargados.'
                         )
 
 
@@ -341,7 +319,7 @@ async function startBot() {
                     ) {
 
                         console.error(
-                            '❌ Error cargando subbots:',
+                            'Error al cargar Jadibots:',
                             error
                         )
 
@@ -373,12 +351,12 @@ async function startBot() {
 
 
                 console.log(
-                    '⚠️ Conexión cerrada.'
+                    'Conexión cerrada.'
                 )
 
 
                 console.log(
-                    '📛 Código:',
+                    '☁ Código:',
                     statusCode
                 )
 
@@ -393,7 +371,7 @@ async function startBot() {
 
 
                     console.log(
-                        '🔄 Reconectando bot principal...'
+                        'Reconectando Socket Principal.'
                     )
 
 
@@ -417,7 +395,7 @@ async function startBot() {
                 ) {
 
                     console.log(
-                        '🚪 Sesión cerrada. Debes volver a vincular el bot.'
+                        'Sesión cerrada. Se necesita vinculación.'
                     )
 
                 }
@@ -439,7 +417,7 @@ async function startBot() {
         try {
 
             console.log(
-                '⏳ Preparando código de vinculación...'
+                'Cargando codigo de conexión'
             )
 
 
@@ -460,27 +438,9 @@ async function startBot() {
 
             console.log(`
 
-╔══════════════════════════════════════╗
-║       🔐 CÓDIGO DE VINCULACIÓN       ║
-╠══════════════════════════════════════╣
-║                                      ║
-║       ${pairingCode}
-║                                      ║
-╚══════════════════════════════════════╝
-
-📱 Abre WhatsApp en tu teléfono.
-
-Ve a:
-
-Dispositivos vinculados
-        ↓
-Vincular un dispositivo
-        ↓
-Vincular con número de teléfono
-
-Introduce el código mostrado arriba.
-
-`)
+               CODE
+ ══════════════════════════════════════ 
+           ${pairingCode}`)
 
 
         } catch (
@@ -488,7 +448,7 @@ Introduce el código mostrado arriba.
         ) {
 
             console.error(
-                '❌ Error generando código:',
+                'Error al generar codigo:',
                 error
             )
 
@@ -513,7 +473,7 @@ Introduce el código mostrado arriba.
             ) {
 
                 console.error(
-                    '❌ Error procesando evento de grupo:',
+                    'Error procesando evento de grupo:',
                     error
                 )
 
@@ -571,7 +531,7 @@ Introduce el código mostrado arriba.
             ) {
 
                 console.error(
-                    '❌ Error procesando mensaje:',
+                    'Error procesando mensaje:',
                     error
                 )
 
@@ -592,7 +552,7 @@ startBot()
         error => {
 
             console.error(
-                '❌ Error fatal:',
+                'Error fatal:',
                 error
             )
 
