@@ -5,7 +5,7 @@ import { getSubbotConfig } from '../../lib/subbotconfig.js'
 
 function getCategoryIcon(category) {
     const icons = {
-        'general': '⚙️'
+        'general': 'ボ'
     }
     return icons[category.toLowerCase()] || '📁'
 }
@@ -63,8 +63,8 @@ export default {
             console.error('Error al leer el directorio de plugins:', e)
         }
 
-        let menuText = `━━━━━━━━━━━━━━━━━━\n`
-        menuText += ` *${botName.toUpperCase()}*\n`
+        let menuText = `━━━━━━━━━━━━━━━━━━━━━━━━\n`
+        
         menuText += `Hola, *${nombre}*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
@@ -73,11 +73,11 @@ export default {
             const icon = getCategoryIcon(category)
             const catName = category.toUpperCase()
 
-            menuText += `╭─〔 ${icon} ${catName} 〕\n`
+            menuText += `${icon} | ${catName} 〕\n`
             for (const cmd of commands) {
-                menuText += `│ • ${usedPrefix}${cmd}\n`
+                menuText += `${usedPrefix}${cmd}\n`
             }
-            menuText += `╰──────────────\n\n`
+            menuText += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
         }
 
         menuText += ` *${botName.toUpperCase()}*`
