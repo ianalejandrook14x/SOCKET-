@@ -1,19 +1,19 @@
 {
-  "name": "elymas-bot",
+  "name": "FIXXED",
   "version": "1.0.0",
-  "description": "Bot de WhatsApp modular con sistema de subbots editables (Creado por Cuervo-Team-Supreme)",
+  "description": "Bot de WhatsApp para gestiones.",
   "type": "module",
   "main": "index.js",
-  "author": "Cuervo-Team-Supreme",
+  "author": "TewIanIx",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CuervoOFC/ELYMAS.git"
+    "url": "https://github.com/ianalejandrook14x/SOCKET-/.git"
   },
   "bugs": {
-    "url": "https://github.com/CuervoOFC/ELYMAS/issues"
+    "url": "https://github.com/ianalejandrook14x/SOCKET-/issues"
   },
-  "homepage": "https://github.com/CuervoOFC/ELYMAS",
+  "homepage": "https://github.com/ianalejandrook14x/SOCKET-",
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
