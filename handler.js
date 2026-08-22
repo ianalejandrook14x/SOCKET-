@@ -1,17 +1,3 @@
-/*
-•❅──────✧✦✧──────❅•
-Codigo Creado Por CUERVO-TEAM-SUPREME
-Para Elymas-Bot Este Codigo Es 
-Exclusivo Y Unico Para Este Bot Al 
-Clonar O Copiar Dejar Estos Creditos 
-De Cuervo-Team-Supreme
-━━━━━ ☾☽ ━━━━━
-ʚĭɞ ೃ CODIGO JAVASCRIPT ʚĭɞ ೃ
-ʚĭɞ ೃ codigo :: handler.js
-ʚĭɞ ೃ funcion :: obtencion de plugins, manejo de before() y comandos
-──────✧✦✧──────
-*/
-
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
@@ -60,11 +46,11 @@ export async function loadPlugins() {
             global.plugins[pluginName] = plugin
             loaded++
         } catch (error) {
-            console.error(`❌ Error cargando plugin: ${file}`, error)
+            console.error(`Error plugin: ${file}`, error)
         }
     }
 
-    console.log(`✅ Plugins cargados: ${loaded}`)
+    console.log(`Plugins cargados: ${loaded}`)
 }
 
 function getMessageText(m) {
@@ -135,7 +121,7 @@ function normalizeMessage(conn, message) {
 }
 
 function getPrefix(text) {
-    const prefixes = config.prefixes || ['.', '#', '/', '!']
+    const prefixes = config.prefixes || ['#']
     for (const prefix of prefixes) {
         if (text.startsWith(prefix)) return prefix
     }
@@ -165,7 +151,7 @@ export default async function handler(conn, message) {
                 try {
                     await plugin.before(m, used)
                 } catch (e) {
-                    console.error('❌ Error ejecutando plugin.before:', e)
+                    console.error('Error ejecutando plugin.before:', e)
                 }
             }
 
@@ -174,7 +160,7 @@ export default async function handler(conn, message) {
                 try {
                     await plugin.all(m, used)
                 } catch (e) {
-                    console.error('❌ Error ejecutando plugin.all:', e)
+                    console.error('Error ejecutando plugin.all:', e)
                 }
             }
         }
@@ -220,11 +206,11 @@ export default async function handler(conn, message) {
             if (!found) continue
 
             if (plugin.onlyMainBot && m.isSubBot) {
-                return m.reply('❌ Este comando solo puede utilizarse en el bot principal.')
+                return m.reply('Este comando solo puede ejecutarse en el bot principal.')
             }
 
             if (plugin.onlySubBot && m.isMainBot) {
-                return m.reply('❌ Este comando solo puede utilizarse en un subbot.')
+                return m.reply('Este comando solo puede ejecutarse en un Jadibot.')
             }
 
             if (typeof plugin.run === 'function') {
@@ -235,6 +221,6 @@ export default async function handler(conn, message) {
         }
 
     } catch (error) {
-        console.error('❌ Error en handler:', error)
+        console.error('Error en handler:', error)
     }
 }
