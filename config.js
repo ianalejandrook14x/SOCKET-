@@ -1,11 +1,11 @@
 /*
-Fixxedd
+Penes gordos
 */
 
 export const config = {
 
-    botName: 'F I X X E D',
-    ownerName: 'TewIanIx',
+    botName: 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ',
+    ownerName: '-',
 
     owners: [
         // Ian
@@ -26,9 +26,9 @@ export const config = {
     loggerLevel: 'silent',
 
     menu: {
-        title: 'F I X X E D',
+        title: 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ',
         description: 'WhatsApp bot',
-        footer: 'By TewIanIx'
+        footer: 'Simple.'
     },
 
     subbots: {
