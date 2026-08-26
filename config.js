@@ -10,6 +10,8 @@ export const config = {
     owners: [
         // Ian
         '5493876639332'
+        // Duarte
+        '573135180876'
     ],
 
     prefixes: [
