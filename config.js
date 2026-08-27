@@ -1,15 +1,15 @@
 /*
-Penes gordos
+Configuraciones globales.
 */
 
 export const config = {
 
     botName: 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ',
-    ownerName: '-',
+    ownerName: 'TewIanIx',
 
     owners: [
         // Ian
-        '5493876639332'
+        '5493876639332',
         // Duarte
         '573135180876'
     ],
