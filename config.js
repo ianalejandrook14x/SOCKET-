@@ -12,6 +12,9 @@ export const config = {
         '5493876639332',
         // Duarte
         '573135180876'
+        // Yo Soy Yo
+        '573133374132',
+        
     ],
 
     prefixes: [
