@@ -1,5 +1,6 @@
 import util from 'util'
 import config from '../../config.js'
+import { createRequire } from 'module'
 
 function extractPureNumber(target) {
     if (!target) return ''
@@ -42,6 +43,8 @@ export default {
         }
 
         try {
+            const require = createRequire(import.meta.url)
+
             const AsyncFunction =
                 Object.getPrototypeOf(
                     async function () {}
@@ -56,6 +59,10 @@ export default {
                 'text',
                 'process',
                 'global',
+                'util',
+                'require',
+                'Buffer',
+                'console',
                 `
                 ${text}
                 `
@@ -69,7 +76,11 @@ export default {
                 args,
                 text,
                 process,
-                global
+                global,
+                util,
+                require,
+                Buffer,
+                console
             )
 
             if (
@@ -80,8 +91,10 @@ export default {
                     typeof result === 'string'
                         ? result
                         : util.inspect(result, {
-                            depth: 3,
-                            colors: false
+                            depth: null,
+                            colors: false,
+                            maxArrayLength: null,
+                            maxStringLength: null
                         })
 
                 await m.reply(output)
