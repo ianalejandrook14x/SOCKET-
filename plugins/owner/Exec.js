@@ -1,12 +1,7 @@
 import util from 'util'
 
 export default {
-    command: [
-        'exec',
-        'ex',
-        'e',
-        'execute'
-    ],
+    command: ['exec', 'ex', 'e', 'execute'],
 
     isOwner: true,
 
