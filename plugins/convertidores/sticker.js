@@ -1,3 +1,18 @@
+/*
+•❅──────✧✦✧──────❅•
+Codigo Creado Por CUERVO-TEAM-SUPREME
+Para Elymas-Bot Este Codigo Es 
+Exclusivo Y Unico Para Este Bot Al 
+Clonar O Copiar Dejar Estos Creditos 
+De Cuervo-Team-Supreme
+━━━━━ ☾☽ ━━━━━
+ʚĭɞ ೃ CODIGO JAVASCRIPT ʚĭɞ ೃ
+ʚĭɞ ೃ codigo :: plugins/convertidores/sticker.js
+ʚĭɞ ೃ funcion :: creacion local de stickers con metadatos oficiales de Baileys
+ʚĭɞ ೃ estado :: completo
+──────✧✦✧──────
+*/
+
 import { downloadContentFromMessage } from '@itsliaaa/baileys'
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs'
@@ -55,87 +70,71 @@ function convertToWebp(inputPath, isVideo) {
 }
 
 export default {
-    command: ['Sticker', 'sticker', 's', 'stiker'],
+    command: ['sticker', 's', 'stiker'],
 
     async run(m, { conn, args }) {
-        try {
-            console.log('cm Sticker ejecutado')
-            
-            const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
-            const botData = getSubbotConfig(rawJid, config)
+        const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
+        const botData = getSubbotConfig(rawJid, config)
 
-            const defaultPackname = botData.name || config.botName || 'tᥱwιᥲᥒιx'
-            const defaultAuthor = botData.ownerName || config.ownerName || 'ιᥲᥒᥲᥣᥱjᥲᥒdrok16x'
+        const defaultPackname = botData.name || config.botName || 'Cuervo'
+        const defaultAuthor = botData.ownerName || config.ownerName || 'TheDevil'
 
-            const q = m.quoted || m
-            const rawMessage = q.message || q.msg || q
-            
-            console.log('Mensaje:', { tipo: typeof rawMessage, keys: Object.keys(rawMessage || {}) })
+        const q = m.quoted ? m.quoted : m
+        const rawMessage = q.message || q.msg || q
 
-            const type = Object.keys(rawMessage || {}).find(
-                key => key === 'imageMessage' || key === 'videoMessage' || key === 'stickerMessage'
+        const type = Object.keys(rawMessage).find(
+            key => key === 'imageMessage' || key === 'videoMessage' || key === 'stickerMessage'
+        )
+
+        const mediaContent = rawMessage[type] || q
+
+        if (!type && !q.mimetype) {
+            return m.reply(
+                '╭─「 🖼️ *STICKER MAKER* 」\n' +
+                '│\n' +
+                '│ ❌ Responde a una *imagen* o *video* con el comando.\n' +
+                '│\n' +
+                '│ 📌 *Ejemplos:*\n' +
+                '│ • Responde a una imagen con `.s`\n' +
+                '│ • Responde a una imagen con `.s Pack | Autor`\n' +
+                '╰──────────────'
             )
+        }
 
-            if (!type && !m.mimetype) {
-                return m.reply('*Responde a una imagen/video* ❀')
-            }
+        const mime = mediaContent.mimetype || q.mimetype || ''
 
-            const mediaContent = rawMessage?.[type] || q
-            const mime = mediaContent?.mimetype || q?.mimetype || m?.mimetype || ''
+        if (mediaContent.seconds > 11) {
+            return m.reply('❌ El video no puede durar más de 10 segundos.')
+        }
 
-            console.log('MIME type:', mime)
+        await m.reply('⏳ *Procesando sticker...*')
 
-            if (mediaContent?.seconds > 11) {
-                return m.reply('*El limite para videos es de 10 segundos* ❀')
-            }
+        const tmpDir = path.join(process.cwd(), 'tmp')
+        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
 
-            await m.reply('*Creando Sticker* ❀')
+        const ext = mime.split('/')[1]?.split(';')[0] || 'tmp'
+        const tmpInput = path.join(tmpDir, `${Date.now()}_in.${ext}`)
 
-            const tmpDir = path.join(process.cwd(), 'tmp')
-            if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
-
-            const ext = mime.split('/')[1]?.split(';')[0] || 'tmp'
-            const tmpInput = path.join(tmpDir, `${Date.now()}_in.${ext}`)
-
-            let mediaBuffer = null
-
+        try {
+            let mediaBuffer
             try {
                 const streamType = mime.split('/')[0]
                 const stream = await downloadContentFromMessage(mediaContent, streamType)
                 mediaBuffer = await streamToBuffer(stream)
-                console.log('Buffer descargado vía stream')
             } catch (e) {
-                console.log('Error en stream:', e.message)
-                
                 if (typeof q.download === 'function') {
-                    try {
-                        mediaBuffer = await q.download()
-                        console.log('Buffer descargado vía q.download()')
-                    } catch (e2) {
-                        console.log('Error en q.download():', e2.message)
-                    }
-                }
-                
-                if (!mediaBuffer && typeof m.download === 'function') {
-                    try {
-                        mediaBuffer = await m.download()
-                        console.log('Buffer descargado vía m.download()')
-                    } catch (e3) {
-                        console.log('Error en m.download():', e3.message)
-                    }
+                    mediaBuffer = await q.download()
                 }
             }
 
             if (!mediaBuffer || mediaBuffer.length === 0) {
-                throw new Error('*No se pudo extraer el archivo multimedia.* ❀')
+                throw new Error('No se pudo extraer el archivo multimedia.')
             }
 
             fs.writeFileSync(tmpInput, mediaBuffer)
-            console.log('Archivo temporal creado.', tmpInput)
 
             const isVideo = mime.startsWith('video')
             const webpBuffer = await convertToWebp(tmpInput, isVideo)
-            console.log('Imagen a WebP completada')
 
             const text = args.join(' ')
             let packname = defaultPackname
@@ -162,10 +161,11 @@ export default {
             )
 
         } catch (error) {
-            console.error('Error en sticker.js:', error)
+            if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
+            console.error('❌ Error en sticker.js:', error)
             return m.reply(
-                'Ocurrió un error\n\n' +
-                `${error.message || error}`
+                '❌ Hubo un error al convertir el archivo a sticker.\n\n' +
+                `📄 Detalle: ${error.message || error}`
             )
         }
     }
