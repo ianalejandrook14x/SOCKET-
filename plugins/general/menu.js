@@ -1,13 +1,13 @@
 import fs from 'fs'
 import path from 'path'
-import config from '../../config.js'
-import { getSubbotConfig } from '../../lib/subbotconfig.js'
 
 function getCategoryIcon(category) {
     const icons = {
-        'general': 'ボ'
+        'general': '✿',
+        'downloader': '✿'
     }
-    return icons[category.toLowerCase()] || '📁'
+
+    return icons[category.toLowerCase()] || '✿'
 }
 
 export default {
@@ -15,16 +15,11 @@ export default {
 
     async run(m, { conn, usedPrefix = '.' }) {
         const nombre = m.pushName || 'Usuario'
-        const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
-        const botData = getSubbotConfig(rawJid, config)
 
-        const botName = botData.name || config.botName || 'F I X X E D ボ'
-        const ownerName = botData.ownerName || config.ownerName || 'TewIanIx'
-        
-        // Obtenemos la media guardada (o fallback a la propiedad image antigua)
-        const mediaUrl = botData.mediaUrl || botData.image
-        const mediaType = botData.mediaType || (botData.image ? 'image' : null)
-
+        const previewTitle = 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
+        const previewBody = 'For TewIanIx'
+        const previewUrl = 'https://ws.ianalejandrook15x.site'
+        const previewImage = 'https://d.uguu.se/WFTURVKV.jpeg'
         const pluginsDir = path.join(process.cwd(), 'plugins')
         const categories = {}
 
@@ -33,39 +28,62 @@ export default {
 
             for (const folder of folders) {
                 const folderPath = path.join(pluginsDir, folder)
-                
-                if (fs.statSync(folderPath).isDirectory()) {
-                    const files = fs.readdirSync(folderPath).filter(file => file.endsWith('.js'))
 
-                    for (const file of files) {
-                        const filePath = path.join(folderPath, file)
-                        try {
-                            const pluginModule = await import(`file://${filePath}`)
-                            const plugin = pluginModule.default || pluginModule
+                if (!fs.statSync(folderPath).isDirectory()) continue
 
-                            if (plugin && plugin.command) {
-                                if (!categories[folder]) {
-                                    categories[folder] = []
-                                }
+                const files = fs
+                    .readdirSync(folderPath)
+                    .filter(file => file.endsWith('.js'))
 
-                                const mainCmd = Array.isArray(plugin.command) ? plugin.command[0] : plugin.command
-                                if (mainCmd) {
-                                    categories[folder].push(mainCmd)
-                                }
-                            }
-                        } catch (e) {
-                            console.error(`Error al cargar el plugin ${file} para el menú:`, e)
+                for (const file of files) {
+                    const filePath = path.join(folderPath, file)
+
+                    try {
+                        const pluginModule = await import(`file://${filePath}`)
+                        const plugin = pluginModule.default || pluginModule
+
+                        if (!plugin || !plugin.command) continue
+
+                        const mainCmd = Array.isArray(plugin.command)
+                            ? plugin.command[0]
+                            : plugin.command
+
+                        if (!mainCmd) continue
+
+                        const commandName = String(mainCmd).toLowerCase()
+
+                        const isExcluded = excludedCommands.some(
+                            excluded =>
+                                commandName === excluded ||
+                                commandName.includes(excluded)
+                        )
+
+                        if (isExcluded) continue
+
+                        if (!categories[folder]) {
+                            categories[folder] = []
                         }
+
+                        categories[folder].push(mainCmd)
+
+                    } catch (e) {
+                        console.error(
+                            `Error al cargar el plugin ${file} para el menú:`,
+                            e
+                        )
                     }
                 }
             }
         } catch (e) {
-            console.error('Error al leer el directorio de plugins:', e)
+            console.error(
+                'Error al leer el directorio de plugins:',
+                e
+            )
         }
 
-        let menuText = `━━━━━━━━━━━━━━━━━━━━━━━━\n`
-        
-        menuText += `Hola, *${nombre}*\n\n`
+        let menuText =
+            `━━━━━━━━━━━━━━━ ✿\n` +
+            `Hola, *${nombre}*\nSoy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
             if (commands.length === 0) continue
@@ -73,31 +91,52 @@ export default {
             const icon = getCategoryIcon(category)
             const catName = category.toUpperCase()
 
-            menuText += `${icon} | ${catName} 〕\n`
+            menuText += `${icon} | ${catName}\n`
+
             for (const cmd of commands) {
                 menuText += `${usedPrefix}${cmd}\n`
             }
-            menuText += `━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
+
+            menuText += `━━━━━━━━━━ ✿ ━━━━━━━━━━\n\n`
         }
 
-        menuText += ` *${botName.toUpperCase()}*`
+        menuText += `bყ ιᥲᥒᥣᥱjᥲᥒdrook16x`
 
-        if (mediaUrl) {
-            if (mediaType === 'video') {
-                await conn.sendMessage(m.chat, {
-                    video: { url: mediaUrl },
-                    caption: menuText,
-                    ptv: true
-                }, { quoted: m })
-                await m.reply(menuText)
-            } else {
-                await conn.sendMessage(m.chat, {
-                    image: { url: mediaUrl },
-                    caption: menuText
-                }, { quoted: m })
+        let thumbnail
+
+        try {
+            const imageResponse = await fetch(previewImage)
+
+            if (imageResponse.ok) {
+                const imageBuffer = await imageResponse.arrayBuffer()
+                thumbnail = Buffer.from(imageBuffer)
             }
-        } else {
-            await m.reply(menuText)
+        } catch (e) {
+            console.error(
+                'Error al descargar la imagen del menú:',
+                e
+            )
         }
+
+        await conn.sendMessage(
+            m.chat,
+            {
+                text: menuText,
+                contextInfo: {
+                    externalAdReply: {
+                        title: previewTitle,
+                        body: previewBody,
+                        mediaType: 1,
+                        renderLargerThumbnail: true,
+                        thumbnail: thumbnail,
+                        sourceUrl: previewUrl,
+                        showAdAttribution: false
+                    }
+                }
+            },
+            {
+                quoted: m
+            }
+        )
     }
 }
