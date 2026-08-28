@@ -41,61 +41,56 @@ export default {
 
         if (!isMainOwner) {
             return m.reply(
-                '*Este comando solo puede ser ejecutado por el creador*'
+                '*Este comando solo puede ser ejecutado por el creador. ❀*'
             )
         }
 
-        await m.reply(
-            '*sᥲtsυkι*\n\n' +
-            '> BAC'
+        if (typeof m.react === 'function') {
+            await m.react('🕘')
+        }
+
+        const message = await m.reply(
+            '❀ *Buscando actualización*'
         )
 
         try {
-            await execAsync(
-                'git fetch origin'
-            )
+            await execAsync('git fetch origin')
 
             const { stdout: status } =
-                await execAsync(
-                    'git status -uno'
-                )
+                await execAsync('git status -uno')
 
             const hasUpdates =
-                status.includes(
-                    'Your branch is behind'
-                ) ||
-                status.includes(
-                    'Tu rama está detrás'
-                ) ||
-                status.includes(
-                    'can be fast-forwarded'
-                ) ||
-                status.includes(
-                    'puede ser actualizada'
-                )
+                status.includes('Your branch is behind') ||
+                status.includes('Tu rama está detrás') ||
+                status.includes('can be fast-forwarded') ||
+                status.includes('puede ser actualizada')
 
             if (!hasUpdates) {
-                return m.reply(
-                    '*sᥲtsυkι*\n\n' +
-                    'No existen cambios nuevos en el repositorio'
+                await conn.sendMessage(
+                    m.chat,
+                    {
+                        text: '*El Socket ya esta actualizado* ❀',
+                        edit: message.key
+                    }
                 )
-            }
 
-            await m.reply(
-                '*sᥲtsυkι*\n\n' +
-                'Descargando actualizaciones del repositorio'
-            )
+                if (typeof m.react === 'function') {
+                    await m.react('✅')
+                }
+
+                return
+            }
 
             let branch = 'main'
 
             try {
-                const { stdout } =
+                const { stdout: currentBranch } =
                     await execAsync(
                         'git branch --show-current'
                     )
 
                 branch =
-                    stdout.trim() || 'main'
+                    currentBranch.trim() || 'main'
             } catch {
                 branch = 'main'
             }
@@ -111,36 +106,57 @@ export default {
                 pullError &&
                 !pullOutput
             ) {
-                return m.reply(
-                    '*sᥲtsυkι*\n\n' +
-                    'Error al actualizar\n\n' +
-                    pullError
+                await conn.sendMessage(
+                    m.chat,
+                    {
+                        text:
+                            'Error al actualizar.\n\n' +
+                            pullError.trim(),
+                        edit: message.key
+                    }
                 )
+
+                if (typeof m.react === 'function') {
+                    await m.react('❌')
+                }
+
+                return
             }
 
             const output =
                 pullOutput.trim()
 
             if (
-                output.includes(
-                    'Already up to date.'
-                ) ||
-                output.includes(
-                    'Already up-to-date'
-                )
+                output.includes('Already up to date.') ||
+                output.includes('Already up-to-date')
             ) {
-                return m.reply(
-                    '*sᥲtsυkι*\n\n' +
-                    'No existen cambios en el repositorio'
+                await conn.sendMessage(
+                    m.chat,
+                    {
+                        text: '*El Socket ya se encuentra actualizado* ❀',
+                        edit: message.key
+                    }
                 )
+
+                if (typeof m.react === 'function') {
+                    await m.react('✅')
+                }
+
+                return
             }
 
-            return m.reply(
-                '*sᥲtsυkι*\n\n' +
-                '```\n' +
-                output +
-                '\n```'
+            await conn.sendMessage(
+                m.chat,
+                {
+                    text:
+                        '*El Socket fue actualizado* ❀',
+                    edit: message.key
+                }
             )
+
+            if (typeof m.react === 'function') {
+                await m.react('✅')
+            }
 
         } catch (error) {
             console.error(
@@ -148,11 +164,19 @@ export default {
                 error
             )
 
-            return m.reply(
-                '*sᥲtsυkι*\n\n' +
-                'Error al actualizar.\n\n' +
-                `${error?.message || 'Error desconocido'}`
+            await conn.sendMessage(
+                m.chat,
+                {
+                    text:
+                        'Error al actualizar.\n\n' +
+                        `${error?.message || 'Error desconocido'}`,
+                    edit: message.key
+                }
             )
+
+            if (typeof m.react === 'function') {
+                await m.react('❌')
+            }
         }
     }
 }
