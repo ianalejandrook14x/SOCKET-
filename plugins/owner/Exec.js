@@ -1,5 +1,5 @@
 export default {
-    command: ['e'],
+    command: ['e', 'exec', 'execute'],
 
     async run(m, { conn, args = '', isOwner }) {
         if (!isOwner) {
