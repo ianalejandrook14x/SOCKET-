@@ -58,50 +58,71 @@ export default {
     command: ['Sticker', 'sticker', 's', 'stiker'],
 
     async run(m, { conn, args }) {
-        const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
-        const botData = getSubbotConfig(rawJid, config)
-
-        const defaultPackname = botData.name || config.botName || 'tᥱwιᥲᥒιx'
-        const defaultAuthor = botData.ownerName || config.ownerName || 'ιᥲᥒᥲᥣᥱjᥲᥒdrok16x'
-
-        const q = m.quoted ? m.quoted : m
-        const rawMessage = q.message || q.msg || q
-
-        const type = Object.keys(rawMessage).find(
-            key => key === 'imageMessage' || key === 'videoMessage' || key === 'stickerMessage'
-        )
-
-        const mediaContent = rawMessage[type] || q
-
-        if (!type && !q.mimetype) {
-            return m.reply(
-                '*Responde a una imagen/video* ❀'
-            )
-        }
-
-        const mime = mediaContent.mimetype || q.mimetype || ''
-
-        if (mediaContent.seconds > 11) {
-            return m.reply('*El limite para videos es de 10 segundos* ❀')
-        }
-
-        await m.reply('*Creando Sticker* ❀')
-
-        const tmpDir = path.join(process.cwd(), 'tmp')
-        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
-
-        const ext = mime.split('/')[1]?.split(';')[0] || 'tmp'
-        const tmpInput = path.join(tmpDir, `${Date.now()}_in.${ext}`)
-
         try {
-            let mediaBuffer
+            console.log('cm Sticker ejecutado')
+            
+            const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
+            const botData = getSubbotConfig(rawJid, config)
+
+            const defaultPackname = botData.name || config.botName || 'tᥱwιᥲᥒιx'
+            const defaultAuthor = botData.ownerName || config.ownerName || 'ιᥲᥒᥲᥣᥱjᥲᥒdrok16x'
+
+            const q = m.quoted || m
+            const rawMessage = q.message || q.msg || q
+            
+            console.log('Mensaje:', { tipo: typeof rawMessage, keys: Object.keys(rawMessage || {}) })
+
+            const type = Object.keys(rawMessage || {}).find(
+                key => key === 'imageMessage' || key === 'videoMessage' || key === 'stickerMessage'
+            )
+
+            if (!type && !m.mimetype) {
+                return m.reply('*Responde a una imagen/video* ❀')
+            }
+
+            const mediaContent = rawMessage?.[type] || q
+            const mime = mediaContent?.mimetype || q?.mimetype || m?.mimetype || ''
+
+            console.log('MIME type:', mime)
+
+            if (mediaContent?.seconds > 11) {
+                return m.reply('*El limite para videos es de 10 segundos* ❀')
+            }
+
+            await m.reply('*Creando Sticker* ❀')
+
+            const tmpDir = path.join(process.cwd(), 'tmp')
+            if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+
+            const ext = mime.split('/')[1]?.split(';')[0] || 'tmp'
+            const tmpInput = path.join(tmpDir, `${Date.now()}_in.${ext}`)
+
+            let mediaBuffer = null
+
             try {
                 const streamType = mime.split('/')[0]
                 const stream = await downloadContentFromMessage(mediaContent, streamType)
                 mediaBuffer = await streamToBuffer(stream)
+                console.log('Buffer descargado vía stream')
             } catch (e) {
+                console.log('Error en stream:', e.message)
+                
                 if (typeof q.download === 'function') {
-                    mediaBuffer = await q.download()
+                    try {
+                        mediaBuffer = await q.download()
+                        console.log('Buffer descargado vía q.download()')
+                    } catch (e2) {
+                        console.log('Error en q.download():', e2.message)
+                    }
+                }
+                
+                if (!mediaBuffer && typeof m.download === 'function') {
+                    try {
+                        mediaBuffer = await m.download()
+                        console.log('Buffer descargado vía m.download()')
+                    } catch (e3) {
+                        console.log('Error en m.download():', e3.message)
+                    }
                 }
             }
 
@@ -110,9 +131,11 @@ export default {
             }
 
             fs.writeFileSync(tmpInput, mediaBuffer)
+            console.log('Archivo temporal creado.', tmpInput)
 
             const isVideo = mime.startsWith('video')
             const webpBuffer = await convertToWebp(tmpInput, isVideo)
+            console.log('Imagen a WebP completada')
 
             const text = args.join(' ')
             let packname = defaultPackname
@@ -139,7 +162,6 @@ export default {
             )
 
         } catch (error) {
-            if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
             console.error('Error en sticker.js:', error)
             return m.reply(
                 'Ocurrió un error\n\n' +
