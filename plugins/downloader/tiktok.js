@@ -2,9 +2,9 @@ const TIKTOK_API = 'https://api.delirius.online/download/tiktok'
 
 export default {
     command: [
-        'Tiktok',
-        'tt',
         'tiktok',
+        'tt',
+        'Tiktok',
         'tik'
     ],
 
@@ -15,7 +15,16 @@ export default {
             )
         }
 
-        const url = args.join(' ').trim()
+        const hd = args.includes('--hd')
+
+        const url = args
+            .filter(arg => arg !== '--hd')
+            .join(' ')
+            .trim()
+
+        if (!url) {
+            return m.reply('Ingresa un enlace de TikTok')
+        }
 
         if (
             !url.includes('tiktok.com') &&
@@ -113,14 +122,23 @@ export default {
                 )
             }
 
-            const video =
-                videoData.hd ||
-                videoData.org ||
-                videoData.wm
+            const video = hd
+                ? (
+                    videoData.hd ||
+                    videoData.org ||
+                    videoData.wm
+                )
+                : (
+                    videoData.org ||
+                    videoData.wm ||
+                    videoData.hd
+                )
 
             if (!video) {
                 throw new Error(
-                    'La API no devolvió una URL válida del video'
+                    hd
+                        ? 'La API no devolvió un URL en HD'
+                        : 'La API no devolvió una URL válida del video'
                 )
             }
 
@@ -141,7 +159,9 @@ export default {
                 {
                     video: videoBuffer,
                     mimetype: 'video/mp4',
-                    fileName: 'tiktok.mp4',
+                    fileName: hd
+                        ? 'tiktok-hd.mp4'
+                        : 'tiktok.mp4',
                     caption: 'TYPAH | ☁',
                     ptv: false
                 },
