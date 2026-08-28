@@ -8,10 +8,7 @@ export default {
     async run(m, { conn, args }) {
         if (!args || args.length === 0) {
             return m.reply(
-                '*Downloader | Tiktok*\n',
-                '*Uso:\n\n*',
-                '*#tiktok https://vt.tiktok.com/xxxxx*',
-                '*#tiktok https://vt.tiktok.com/xxxxx --hd* | HD Quality'
+                '*Downloader | Tiktok*\n *Uso:\n\n*#tiktok https://vt.tiktok.com/xxxxx*\n*#tiktok https://vt.tiktok.com/xxxxx --hd* | HD Quality'
             )
         }
 
