@@ -118,7 +118,7 @@ export default {
                 menuText += `${usedPrefix}${cmd}\n`
             }
 
-            menuText += `━━━━━━━━━━━━━━━ ✿\n\n`
+            menuText += `━━━━━━━━━━━━━━━ ✿\n`
         }
 
         menuText += `bყ ιᥲᥒᥣᥱjᥲᥒdrook16x`
