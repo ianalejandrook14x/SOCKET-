@@ -16,7 +16,7 @@ async function streamToBuffer(stream) {
 function convertToWebp(inputPath, isVideo) {
     return new Promise((resolve, reject) => {
         const tmpOutput = path.join(process.cwd(), 'tmp', `${Date.now()}_out.webp`)
-        
+
         const options = isVideo
             ? [
                 '-vcodec', 'libwebp',
@@ -61,8 +61,8 @@ export default {
         const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
         const botData = getSubbotConfig(rawJid, config)
 
-        const defaultPackname = botData.name || config.botName || 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
-        const defaultAuthor = botData.ownerName || config.ownerName || 'bყ ιᥲᥒᥲᥣᥱjᥲᥒdrook16x'
+        const defaultPackname = 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
+        const defaultAuthor = 'bყ ιᥲᥒᥲᥣᥱjᥲᥒdrook16x'
 
         const q = m.quoted ? m.quoted : m
         const rawMessage = q.message || q.msg || q
@@ -74,9 +74,7 @@ export default {
         const mediaContent = rawMessage[type] || q
 
         if (!type && !q.mimetype) {
-            return m.reply(
-                '*Responde a una imagen/video*'
-            )
+            return m.reply('*Responde a una imagen/video*')
         }
 
         const mime = mediaContent.mimetype || q.mimetype || ''
@@ -85,7 +83,17 @@ export default {
             return m.reply('*El limite para video es de 10s*')
         }
 
-        await m.reply('*Creando sticker*')
+        try {
+            await conn.sendMessage(
+                m.chat,
+                {
+                    react: {
+                        text: '🕗',
+                        key: m.key
+                    }
+                }
+            )
+        } catch {}
 
         const tmpDir = path.join(process.cwd(), 'tmp')
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
@@ -95,6 +103,7 @@ export default {
 
         try {
             let mediaBuffer
+
             try {
                 const streamType = mime.split('/')[0]
                 const stream = await downloadContentFromMessage(mediaContent, streamType)
@@ -120,27 +129,63 @@ export default {
 
             if (text.includes('|')) {
                 const [p, a] = text.split('|')
-                if (p && p.trim()) packname = p.trim()
-                if (a && a.trim()) author = a.trim()
+
+                if (p && p.trim()) {
+                    packname = p.trim()
+                }
+
+                if (a && a.trim()) {
+                    author = a.trim()
+                }
             } else if (text.trim()) {
                 packname = text.trim()
             }
 
             if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
 
-            return await conn.sendMessage(
+            const stickerMessage = await conn.sendMessage(
                 m.chat,
-                { 
+                {
                     sticker: webpBuffer,
                     packname: packname,
                     author: author
                 },
-                { quoted: m }
+                {
+                    quoted: m
+                }
             )
+
+            try {
+                await conn.sendMessage(
+                    m.chat,
+                    {
+                        react: {
+                            text: '✅',
+                            key: m.key
+                        }
+                    }
+                )
+            } catch {}
+
+            return stickerMessage
 
         } catch (error) {
             if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
-            console.error('Ocurrío  un error en Sticker.js', error)
+
+            console.error('Ocurrío un error en Sticker.js', error)
+
+            try {
+                await conn.sendMessage(
+                    m.chat,
+                    {
+                        react: {
+                            text: '❌',
+                            key: m.key
+                        }
+                    }
+                )
+            } catch {}
+
             return m.reply(
                 'Error\n\n' +
                 `Detalle: ${error.message || error}`
