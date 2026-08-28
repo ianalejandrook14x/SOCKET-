@@ -17,7 +17,7 @@ export default {
         const nombre = m.pushName || 'Usuario'
 
         const previewTitle = 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
-        const previewBody = 'For TewIanIx'
+        const previewBody = 'for tᥱwιᥲᥒιx'
         const previewUrl = 'https://ws.ianalejandrook15x.site'
         const previewImage = 'https://files.catbox.moe/7y3cph.jpeg'
 
