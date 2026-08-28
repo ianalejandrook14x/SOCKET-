@@ -13,6 +13,13 @@ function extractPureNumber(target) {
         .replace(/[^0-9]/g, '')
 }
 
+async function git(command, cwd) {
+    return await execAsync(command, {
+        cwd,
+        maxBuffer: 1024 * 1024 * 10
+    })
+}
+
 export default {
     command: [
         'fix',
@@ -35,8 +42,7 @@ export default {
             Array.isArray(config?.owners) &&
             config.owners.some(
                 owner =>
-                    extractPureNumber(owner) ===
-                    senderNum
+                    extractPureNumber(owner) === senderNum
             )
 
         if (!isMainOwner) {
@@ -54,86 +60,76 @@ export default {
         )
 
         try {
-            await execAsync('git fetch origin')
-
-            const { stdout: status } =
-                await execAsync('git status -uno')
-
-            const hasUpdates =
-                status.includes('Your branch is behind') ||
-                status.includes('Tu rama está detrás') ||
-                status.includes('can be fast-forwarded') ||
-                status.includes('puede ser actualizada')
-
-            if (!hasUpdates) {
-                await conn.sendMessage(
-                    m.chat,
+            const { stdout: repoPath } =
+                await execAsync(
+                    'git rev-parse --show-toplevel',
                     {
-                        text: '*El Socket ya esta actualizado* ❀',
-                        edit: message.key
+                        cwd: process.cwd()
                     }
                 )
 
-                if (typeof m.react === 'function') {
-                    await m.react('✅')
-                }
+            const cwd = repoPath.trim()
 
-                return
+            if (!cwd) {
+                throw new Error(
+                    'No se encontró la raíz del repositorio Git'
+                )
             }
 
             let branch = 'main'
 
             try {
-                const { stdout: currentBranch } =
-                    await execAsync(
-                        'git branch --show-current'
+                const { stdout } =
+                    await git(
+                        'git branch --show-current',
+                        cwd
                     )
 
                 branch =
-                    currentBranch.trim() || 'main'
+                    stdout.trim() || 'main'
             } catch {
                 branch = 'main'
             }
 
-            const {
-                stdout: pullOutput,
-                stderr: pullError
-            } = await execAsync(
-                `git pull origin ${branch}`
+            await git(
+                'git fetch origin',
+                cwd
             )
 
-            if (
-                pullError &&
-                !pullOutput
-            ) {
+            let aheadBehind
+
+            try {
+                const { stdout } =
+                    await git(
+                        `git rev-list --left-right --count HEAD...origin/${branch}`,
+                        cwd
+                    )
+
+                const values =
+                    stdout.trim().split(/\s+/)
+
+                const localAhead =
+                    Number(values[0] || 0)
+
+                const remoteAhead =
+                    Number(values[1] || 0)
+
+                aheadBehind = {
+                    localAhead,
+                    remoteAhead
+                }
+            } catch {
+                throw new Error(
+                    `No se pudo comprobar origin/${branch}`
+                )
+            }
+
+            if (aheadBehind.remoteAhead === 0) {
                 await conn.sendMessage(
                     m.chat,
                     {
                         text:
-                            'Error al actualizar.\n\n' +
-                            pullError.trim(),
-                        edit: message.key
-                    }
-                )
-
-                if (typeof m.react === 'function') {
-                    await m.react('❌')
-                }
-
-                return
-            }
-
-            const output =
-                pullOutput.trim()
-
-            if (
-                output.includes('Already up to date.') ||
-                output.includes('Already up-to-date')
-            ) {
-                await conn.sendMessage(
-                    m.chat,
-                    {
-                        text: '*El Socket ya se encuentra actualizado* ❀',
+                            '*El Socket ya está actualizado* ❀',
                         edit: message.key
                     }
                 )
@@ -145,11 +141,37 @@ export default {
                 return
             }
 
+            const {
+                stdout: pullOutput,
+                stderr: pullError
+            } = await git(
+                `git pull --ff-only origin ${branch}`,
+                cwd
+            )
+
+            if (
+                pullError &&
+                !pullOutput &&
+                !pullError.includes(
+                    'Already up to date'
+                )
+            ) {
+                throw new Error(
+                    pullError.trim()
+                )
+            }
+
+            const output =
+                pullOutput.trim()
+
             await conn.sendMessage(
                 m.chat,
                 {
                     text:
-                        '*El Socket fue actualizado* ❀',
+                        '*El Socket fue actualizado* ❀\n\n' +
+                        '```' +
+                        output +
+                        '```',
                     edit: message.key
                 }
             )
@@ -168,7 +190,7 @@ export default {
                 m.chat,
                 {
                     text:
-                        'Error al actualizar.\n\n' +
+                        '*Error al actualizar* ❀\n\n' +
                         `${error?.message || 'Error desconocido'}`,
                     edit: message.key
                 }
