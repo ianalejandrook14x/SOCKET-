@@ -11,7 +11,7 @@ export default {
     async run(m, { conn, args }) {
         if (!args || args.length === 0) {
             return m.reply(
-                'TYPAH | ☁'
+                '*Downloader | Tiktok*\n *Uso:*\n\n*#tiktok https://vt.tiktok.com/xxxxx*\n*#tiktok https://vt.tiktok.com/xxxxx --hd* | HD Quality'
             )
         }
 
@@ -23,13 +23,14 @@ export default {
             .trim()
 
         if (!url) {
-            return m.reply('Ingresa un enlace de TikTok')
+            return m.reply('*Uso correcto:*\n\n> *#tiktok https://vt.tiktok.com/xxxxx --hd*')
         }
 
         if (
             !url.includes('tiktok.com') &&
             !url.includes('vm.tiktok.com') &&
-            !url.includes('vt.tiktok.com')
+            !url.includes('vt.tiktok.com') &&
+            !url.includes('www.tiktok.com')
         ) {
             return m.reply('Ingresa un enlace de TikTok')
         }
@@ -71,6 +72,69 @@ export default {
                 )
             }
 
+            const title =
+                data.title ||
+                'Sin título'
+
+            const authorUsername =
+                data.author?.username ||
+                'Desconocido'
+
+            const authorNickname =
+                data.author?.nickname ||
+                'Desconocido'
+
+            const duration =
+                data.duration !== undefined
+                    ? `${data.duration}s`
+                    : 'Desconocida'
+
+            const repro =
+                data.repro ||
+                '0'
+
+            const like =
+                data.like ||
+                '0'
+
+            const share =
+                data.share ||
+                '0'
+
+            const comment =
+                data.comment ||
+                '0'
+
+            const published =
+                data.published ||
+                'Desconocida'
+
+            const musicTitle =
+                data.music?.title ||
+                'Sin información'
+
+            const musicAuthor =
+                data.music?.author ||
+                'Desconocido'
+
+            const caption =
+                `
+✦ ━━━━━━━━━ ᴛɪᴋᴛᴏᴋ ━━━━━━━━━ ✦
+
+✦ ━━ ᴛɪᴛᴜʟᴏ: ${title}
+✦ ━━ ᴄʀᴇᴀᴅᴏʀ: ${authorNickname} / ${authorUsername}
+✦ ━━ ᴅᴜʀᴀᴄɪóɴ: ${duration}
+✦ ━━ ᴠɪꜱᴛᴀꜱ: ${repro}
+✦ ━━ ʟɪᴋᴇꜱ: ${like}
+✦ ━━ ᴄᴏᴍᴘᴀʀᴛɪᴅᴏꜱ: ${share}
+✦ ━━ ᴄᴏᴍᴇɴᴛᴀʀɪᴏꜱ: ${comment}
+✦ ━━ ᴘᴜʙʟɪᴄᴀᴅᴏ: ${published}
+
+✦ ━━━━━━━━━ ᴀᴜᴅɪᴏ ━━━━━━━━━ ✦
+
+✦ ━━ ᴍᴜꜱɪᴄᴀ: ${musicTitle}
+✦ ━━ ᴀᴜᴛᴏʀ: ${musicAuthor}`
+
             const photos = media.filter(
                 item =>
                     item?.type === 'photo' ||
@@ -94,7 +158,7 @@ export default {
                             },
                             caption:
                                 i === 0
-                                    ? 'TYPAH | ☁'
+                                    ? caption
                                     : ''
                         },
                         {
@@ -137,7 +201,7 @@ export default {
             if (!video) {
                 throw new Error(
                     hd
-                        ? 'La API no devolvió un URL en HD'
+                        ? 'La API no devolvió una URL HD válida del video'
                         : 'La API no devolvió una URL válida del video'
                 )
             }
@@ -162,7 +226,7 @@ export default {
                     fileName: hd
                         ? 'tiktok-hd.mp4'
                         : 'tiktok.mp4',
-                    caption: 'TYPAH | ☁',
+                    caption: caption,
                     ptv: false
                 },
                 {
