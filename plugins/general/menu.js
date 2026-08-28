@@ -115,10 +115,10 @@ export default {
             menuText += `${icon} | ${catName}\n`
 
             for (const cmd of commands) {
-                menuText += `${usedPrefix}${cmd}\n`
+                menuText += `${usedPrefix}${cmd}\n\n`
             }
 
-            menuText += `━━━━━━━━━━ ✿ ━━━━━━━━━━\n\n`
+            menuText += `━━━━━━━━━━━━━━━ ✿\n\n`
         }
 
         menuText += `bყ ιᥲᥒᥣᥱjᥲᥒdrook16x`
