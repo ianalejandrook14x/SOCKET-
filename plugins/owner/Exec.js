@@ -11,12 +11,7 @@ function extractPureNumber(target) {
 }
 
 export default {
-    command: [
-        'exec',
-        'ex',
-        'e',
-        'execute'
-    ],
+    command: ['exec', 'ex', 'e', 'execute'],
 
     async run(m, { conn, args, text, message }) {
         const senderJid =
@@ -25,17 +20,16 @@ export default {
             m?.key?.remoteJid ||
             ''
 
-        const senderNum =
-            extractPureNumber(senderJid)
+        const senderNum = extractPureNumber(senderJid)
 
-        const isMainOwner =
+        const isOwner =
             Array.isArray(config?.owners) &&
             config.owners.some(
                 owner =>
                     extractPureNumber(owner) === senderNum
             )
 
-        if (!isMainOwner) {
+        if (!isOwner) {
             return m.reply(
                 '*Este comando solo puede ser ejecutado por el creador. ❀*'
             )
@@ -53,48 +47,55 @@ export default {
                     async function () {}
                 ).constructor
 
-            const execute =
-                new AsyncFunction(
-                    'm',
-                    'conn',
-                    'args',
-                    'message',
-                    'process',
-                    'global',
-                    text
-                )
+            const execute = new AsyncFunction(
+                'm',
+                'conn',
+                'args',
+                'message',
+                'process',
+                'global',
+                `
+                return await (async () => {
+                    ${text}
+                })()
+                `
+            )
 
-            const result =
-                await execute(
-                    m,
-                    conn,
-                    args,
-                    message,
-                    process,
-                    global
-                )
+            const result = await execute(
+                m,
+                conn,
+                args,
+                message,
+                process,
+                global
+            )
+
+            if (result === undefined || result === null) {
+                return
+            }
 
             if (
-                result !== undefined &&
-                result !== null
+                typeof result === 'object' &&
+                result?.key &&
+                result?.message
             ) {
-                await m.reply(
-                    typeof result === 'string'
-                        ? result
-                        : util.inspect(
-                            result,
-                            {
-                                depth: 2,
-                                colors: false
-                            }
-                        )
-                )
+                return
             }
+
+            const output =
+                typeof result === 'string'
+                    ? result
+                    : util.inspect(result, {
+                        depth: 3,
+                        colors: false
+                    })
+
+            await m.reply(output)
 
         } catch (error) {
             await m.reply(
                 '*Error al ejecutar JavaScript:*\n\n' +
-                `${util.format(error)}`
+                util.format(error)
             )
         }
     }
