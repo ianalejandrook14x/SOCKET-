@@ -11,7 +11,7 @@ function getCategoryIcon(category) {
 }
 
 export default {
-    command: ['menu', 'menú', 'help', 'inicio'],
+    command: ['menu', 'menú', 'help', 'inicio', 'ayuda'],
 
     async run(m, { conn, usedPrefix = '.' }) {
         const nombre = m.pushName || 'Usuario'
