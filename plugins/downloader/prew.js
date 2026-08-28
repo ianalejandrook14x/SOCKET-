@@ -26,7 +26,8 @@ export default {
         if (
             !url.includes('tiktok.com') &&
             !url.includes('vm.tiktok.com') &&
-            !url.includes('vt.tiktok.com')
+            !url.includes('vt.tiktok.com') &&
+            !url.includes('www.tiktok.com')
         ) {
             return m.reply('Ingresa un enlace de TikTok')
         }
