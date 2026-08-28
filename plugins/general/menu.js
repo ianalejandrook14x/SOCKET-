@@ -19,7 +19,7 @@ export default {
         const previewTitle = 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
         const previewBody = 'For TewIanIx'
         const previewUrl = 'https://ws.ianalejandrook15x.site'
-        const previewImage = 'https://d.uguu.se/WFTURVKV.jpeg'
+        const previewImage = 'https://files.catbox.moe/7y3cph.jpeg'
 
         const excludedCommands = [
             'imagen',
