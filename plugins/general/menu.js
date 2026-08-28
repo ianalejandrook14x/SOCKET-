@@ -20,6 +20,27 @@ export default {
         const previewBody = 'For TewIanIx'
         const previewUrl = 'https://ws.ianalejandrook15x.site'
         const previewImage = 'https://d.uguu.se/WFTURVKV.jpeg'
+
+        const excludedCommands = [
+            'imagen',
+            'imagenes',
+            'imágenes',
+            'image',
+            'images',
+            'img',
+            'buscarimagen',
+            'buscarimagenes',
+            'buscarimágenes',
+            'googleimagen',
+            'googleimagenes',
+            'googleimages',
+            'pinterest',
+            'pin',
+            'pixiv',
+            'unsplash',
+            'wallpaper'
+        ]
+
         const pluginsDir = path.join(process.cwd(), 'plugins')
         const categories = {}
 
