@@ -112,10 +112,10 @@ export default {
             const icon = getCategoryIcon(category)
             const catName = category.toUpperCase()
 
-            menuText += `${icon} | ${catName}\n`
+            menuText += `${icon} | ${catName}\n\n`
 
             for (const cmd of commands) {
-                menuText += `${usedPrefix}${cmd}\n\n`
+                menuText += `${usedPrefix}${cmd}\n`
             }
 
             menuText += `━━━━━━━━━━━━━━━ ✿\n\n`
