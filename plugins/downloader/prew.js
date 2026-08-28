@@ -8,7 +8,10 @@ export default {
     async run(m, { conn, args }) {
         if (!args || args.length === 0) {
             return m.reply(
-                'TYPAH | ☁'
+                '*Downloader | Tiktok*\n',
+                '*Uso:\n\n*',
+                '*#tiktok https://vt.tiktok.com/xxxxx*',
+                '*#tiktok https://vt.tiktok.com/xxxxx --hd* | HD Quality'
             )
         }
 
@@ -20,7 +23,7 @@ export default {
             .trim()
 
         if (!url) {
-            return m.reply('Ingresa un enlace de TikTok')
+            return m.reply('*Uso correcto:*\n> *#tiktok https://vt.tiktok.com/xxxxx --hd*')
         }
 
         if (
