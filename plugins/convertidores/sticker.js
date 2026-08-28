@@ -61,7 +61,7 @@ export default {
         const rawJid = conn?.user?.jid || conn?.user?.id || conn?.subBotJid || ''
         const botData = getSubbotConfig(rawJid, config)
 
-        const defaultPackname = botData.name || config.botName || 'tᥱwιᥲᥒιx'
+        const defaultPackname = botData.name || config.botName || 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
         const defaultAuthor = botData.ownerName || config.ownerName || 'bყ ιᥲᥒᥲᥣᥱjᥲᥒdrook16x'
 
         const q = m.quoted ? m.quoted : m
