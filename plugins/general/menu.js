@@ -3,7 +3,7 @@ import path from 'path'
 import {
     prepareWAMessageMedia,
     generateWAMessageFromContent
-} from '@whiskeysockets/baileys'
+} from '@itsliaaa/baileys'
 
 function getCategoryIcon(category) {
     const icons = {
@@ -18,7 +18,7 @@ async function getBuffer(url) {
     const response = await fetch(url)
 
     if (!response.ok) {
-        throw new Error(Error descargando imagen: ${response.status})
+        throw new Error(`Error descargando imagen: ${response.status}`)
     }
 
     return Buffer.from(await response.arrayBuffer())
@@ -74,7 +74,7 @@ export default {
                     const filePath = path.join(folderPath, file)
 
                     try {
-                        const pluginModule = await import(file://${filePath})
+                        const pluginModule = await import(`file://${filePath}`)
                         const plugin = pluginModule.default || pluginModule
 
                         if (!plugin || !plugin.command) continue
@@ -103,7 +103,7 @@ export default {
 
                     } catch (e) {
                         console.error(
-                            Error al cargar el plugin ${file} para el menú:,
+                            `Error al cargar el plugin ${file} para el menú:`,
                             e
                         )
                     }
@@ -117,8 +117,8 @@ export default {
         }
 
         let menuText =
-            ━━━━━━━━━━━━━━━ ✿\n +
-            Hola, *${nombre}*\nSoy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n
+            `━━━━━━━━━━━━━━━ ✿\n` +
+            `Hola, *${nombre}*\nSoy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
             if (commands.length === 0) continue
@@ -126,16 +126,16 @@ export default {
             const icon = getCategoryIcon(category)
             const catName = category.toUpperCase()
 
-            menuText += ${icon} | ${catName}\n\n
+            menuText += `${icon} | ${catName}\n\n`
 
             for (const cmd of commands) {
-                menuText += ${usedPrefix}${cmd}\n
+                menuText += `${usedPrefix}${cmd}\n`
             }
 
-            menuText += ━━━━━━━━━━━━━━━ ✿\n
+            menuText += `━━━━━━━━━━━━━━━ ✿\n`
         }
 
-        menuText += bყ ιᥲᥒᥣᥱjᥲᥒdrook16x
+        menuText += `bყ ιᥲᥒᥣᥱjᥲᥒdrook16x`
 
         try {
             const imageBuffer = await getBuffer(previewImage)
@@ -206,7 +206,6 @@ export default {
                 e
             )
 
-            // Fallback: enviar el menú normalmente si falla la preview
             await conn.sendMessage(
                 m.chat,
                 {
