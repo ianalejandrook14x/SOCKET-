@@ -3,7 +3,7 @@ import path from 'path'
 import {
     prepareWAMessageMedia,
     generateWAMessageFromContent
-} from '@itsliaaa/baileys'
+} from '@whiskeysockets/baileys'
 
 function getCategoryIcon(category) {
     const icons = {
@@ -206,6 +206,7 @@ export default {
                 e
             )
 
+            // Fallback: enviar el menú normalmente si falla la preview
             await conn.sendMessage(
                 m.chat,
                 {
