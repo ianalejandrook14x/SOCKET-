@@ -1,5 +1,9 @@
 import fs from 'fs'
 import path from 'path'
+import {
+    prepareWAMessageMedia,
+    generateWAMessageFromContent
+} from '@whiskeysockets/baileys'
 
 function getCategoryIcon(category) {
     const icons = {
@@ -8,6 +12,16 @@ function getCategoryIcon(category) {
     }
 
     return icons[category.toLowerCase()] || '✿'
+}
+
+async function getBuffer(url) {
+    const response = await fetch(url)
+
+    if (!response.ok) {
+        throw new Error(Error descargando imagen: ${response.status})
+    }
+
+    return Buffer.from(await response.arrayBuffer())
 }
 
 export default {
@@ -60,7 +74,7 @@ export default {
                     const filePath = path.join(folderPath, file)
 
                     try {
-                        const pluginModule = await import(`file://${filePath}`)
+                        const pluginModule = await import(file://${filePath})
                         const plugin = pluginModule.default || pluginModule
 
                         if (!plugin || !plugin.command) continue
@@ -89,7 +103,7 @@ export default {
 
                     } catch (e) {
                         console.error(
-                            `Error al cargar el plugin ${file} para el menú:`,
+                            Error al cargar el plugin ${file} para el menú:,
                             e
                         )
                     }
@@ -103,8 +117,8 @@ export default {
         }
 
         let menuText =
-            `━━━━━━━━━━━━━━━ ✿\n` +
-            `Hola, *${nombre}*\nSoy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n`
+            ━━━━━━━━━━━━━━━ ✿\n +
+            Hola, *${nombre}*\nSoy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n
 
         for (const [category, commands] of Object.entries(categories)) {
             if (commands.length === 0) continue
@@ -112,52 +126,96 @@ export default {
             const icon = getCategoryIcon(category)
             const catName = category.toUpperCase()
 
-            menuText += `${icon} | ${catName}\n\n`
+            menuText += ${icon} | ${catName}\n\n
 
             for (const cmd of commands) {
-                menuText += `${usedPrefix}${cmd}\n`
+                menuText += ${usedPrefix}${cmd}\n
             }
 
-            menuText += `━━━━━━━━━━━━━━━ ✿\n`
+            menuText += ━━━━━━━━━━━━━━━ ✿\n
         }
 
-        menuText += `bყ ιᥲᥒᥣᥱjᥲᥒdrook16x`
-
-        let thumbnail
+        menuText += bყ ιᥲᥒᥣᥱjᥲᥒdrook16x
 
         try {
-            const imageResponse = await fetch(previewImage)
+            const imageBuffer = await getBuffer(previewImage)
 
-            if (imageResponse.ok) {
-                const imageBuffer = await imageResponse.arrayBuffer()
-                thumbnail = Buffer.from(imageBuffer)
+            const media = await prepareWAMessageMedia(
+                { image: imageBuffer },
+                {
+                    upload: conn.waUploadToServer,
+                    mediaTypeOverride: 'thumbnail-link'
+                }
+            )
+
+            const imageMessage = media.imageMessage
+
+            const getTs = (ts) =>
+                typeof ts === 'object'
+                    ? Number(ts?.low || ts)
+                    : Number(ts)
+
+            const content = {
+                extendedTextMessage: {
+                    text: menuText,
+
+                    matchedText: previewUrl,
+                    canonicalUrl: previewUrl,
+
+                    description: previewBody,
+                    title: previewTitle,
+
+                    previewType: 0,
+
+                    jpegThumbnail: imageMessage.jpegThumbnail,
+                    thumbnailDirectPath: imageMessage.directPath,
+                    thumbnailSha256: imageMessage.fileSha256,
+                    thumbnailEncSha256: imageMessage.fileEncSha256,
+                    mediaKey: imageMessage.mediaKey,
+                    mediaKeyTimestamp: getTs(
+                        imageMessage.mediaKeyTimestamp
+                    ),
+
+                    thumbnailHeight: imageMessage.height || 1080,
+                    thumbnailWidth: imageMessage.width || 1920,
+
+                    contextInfo: {}
+                }
             }
+
+            const waMsg = generateWAMessageFromContent(
+                m.chat,
+                content,
+                {
+                    userJid: conn.user?.id,
+                    quoted: m
+                }
+            )
+
+            await conn.relayMessage(
+                m.chat,
+                waMsg.message,
+                {
+                    messageId: waMsg.key.id
+                }
+            )
+
         } catch (e) {
             console.error(
-                'Error al descargar la imagen del menú:',
+                'Error al generar el link preview del menú:',
                 e
             )
-        }
 
-        await conn.sendMessage(
-            m.chat,
-            {
-                text: menuText,
-                contextInfo: {
-                    externalAdReply: {
-                        title: previewTitle,
-                        body: previewBody,
-                        mediaType: 1,
-                        renderLargerThumbnail: true,
-                        thumbnail: thumbnail,
-                        sourceUrl: previewUrl,
-                        showAdAttribution: false
-                    }
+            // Fallback: enviar el menú normalmente si falla la preview
+            await conn.sendMessage(
+                m.chat,
+                {
+                    text: menuText
+                },
+                {
+                    quoted: m
                 }
-            },
-            {
-                quoted: m
-            }
-        )
+            )
+        }
     }
 }
