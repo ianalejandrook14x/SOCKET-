@@ -3,7 +3,7 @@ import path from 'path'
 import {
     prepareWAMessageMedia,
     generateWAMessageFromContent
-} from '@whiskeysockets/baileys'
+} from '@itsliaaa/baileys'
 
 function getCategoryIcon(category) {
     const icons = {
