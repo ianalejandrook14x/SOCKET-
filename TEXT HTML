@@ -1,0 +1,132 @@
+import ytSearch from "yt-search";
+import { kartuMusik, audioDataUri, coverDataUri } from "./sync-lirik.js";
+import { cariLirik } from "./html-music.js";
+
+const proses = new Set();
+
+export default {
+    run: async (e, i, { func: r }) => {
+        if (!e.text) return e.reply(r.example(e.cmd, "melukis senja"));
+
+        const query = e.text.trim();
+
+        if (proses.has(query)) {
+            return e.reply("✦ Masih ada proses play yang berjalan.");
+        }
+
+        proses.add(query);
+
+        try {
+            await i.sendReact(e.chat, "🎵", e.key);
+
+            // 1. Cari video
+            const hasil = await ytSearch(query);
+            const video = hasil.videos?.[0];
+            if (!video) return e.reply("✗ Lagu tidak ditemukan.");
+
+            // 2. Ambil audio
+            const audioApi = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(video.url)}`;
+            const req = await fetch(audioApi);
+            const json = await req.json();
+            if (!json.status || !json.result?.mp3) {
+                return e.reply("✗ Gagal mengambil audio.");
+            }
+
+            const audioRes = await fetch(json.result.mp3);
+            const audioBuffer = Buffer.from(await audioRes.arrayBuffer());
+
+            // 3. Konversi audio ke data URI
+            const audio = await audioDataUri(audioBuffer, {
+                codec: "opus",
+            });
+            if (!audio) {
+                return e.reply("✗ Gagal mengkonversi audio (terlalu besar).");
+            }
+
+            // 4. Ambil cover
+            const cover = await coverDataUri(video.thumbnail);
+
+            // 5. Cari lirik
+            let lyric = null;
+            try {
+                lyric = await cariLirik(video);
+            } catch (err) {
+                console.warn("[Play] Gagal ambil lirik:", err.message);
+            }
+            const lirikArray = lyric?.baris || [];
+
+            // 6. Buat HTML kartu musik
+            const html = kartuMusik({
+                judul: video.title,
+                artis: video.author?.name || "Unknown",
+                audioSrc: audio.dataUri,
+                coverSrc: cover?.dataUri || "",
+                warna: cover?.warna || "#222a38",
+                lirik: lirikArray,
+            });
+
+            // 7. Kirim sebagai interactive HTML (sama seperti tictactoe2)
+            const responseId = `music-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            const payload = {
+                response_id: responseId,
+                sections: [{
+                    view_model: {
+                        primitive: {
+                            __typename: "GenAIaeacdsnwHtmlPrimitive",
+                            payload: html,
+                            trusted_sources: [],
+                        },
+                        __typename: "GenAISingleLayoutViewModel",
+                    },
+                }],
+            };
+            const base64Payload = Buffer.from(JSON.stringify(payload)).toString("base64");
+
+            await i.relayMessage(e.chat, {
+                messageContextInfo: {
+                    deviceListMetadata: {},
+                    deviceListMetadataVersion: 2,
+                    botMetadata: {
+                        messageDisclaimerText: "",
+                        botResponseId: responseId,
+                    },
+                },
+                botForwardedMessage: {
+                    message: {
+                        richResponseMessage: {
+                            messageType: 1,
+                            submessages: [{
+                                messageType: 2,
+                                messageText: "🎵 " + video.title,
+                            }],
+                            unifiedResponse: {
+                                data: base64Payload,
+                            },
+                            contextInfo: {
+                                forwardingScore: 1,
+                                isForwarded: true,
+                                forwardedAiBotMessageInfo: {
+                                    botJid: "867051314767696@bot",
+                                },
+                                forwardOrigin: 4,
+                            },
+                        },
+                    },
+                },
+            }, { messageId: responseId });
+
+        } catch (err) {
+            console.error("PLAY ERROR:", err);
+            e.reply(`✗ Error: ${err.message}`);
+        } finally {
+            proses.delete(query);
+        }
+    },
+
+    cmd: "play",
+    use: "judul lagu / link youtube",
+    type: "downloader",
+    restrict: true,
+    limit: 5,
+    location: "plugins/downloader/play.js",
+};
