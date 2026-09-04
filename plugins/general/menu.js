@@ -1,27 +1,15 @@
 import fs from 'fs'
 import path from 'path'
-import {
-    prepareWAMessageMedia,
-    generateWAMessageFromContent
-} from '@itsliaaa/baileys'
+import sharp from 'sharp'
+import { prepareWAMessageMedia } from '@itsliaaa/baileys'
 
 function getCategoryIcon(category) {
     const icons = {
-        'general': '✿',
-        'downloader': '✿'
+        general: '',
+        downloader: ''
     }
 
-    return icons[category.toLowerCase()] || '✿'
-}
-
-async function getBuffer(url) {
-    const response = await fetch(url)
-
-    if (!response.ok) {
-        throw new Error(`Error descargando imagen: ${response.status}`)
-    }
-
-    return Buffer.from(await response.arrayBuffer())
+    return icons[category.toLowerCase()] || '🍃'
 }
 
 export default {
@@ -32,7 +20,7 @@ export default {
 
         const previewTitle = 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
         const previewBody = 'for tᥱwιᥲᥒιx'
-        const previewUrl = 'https://ws.ianalejandrook15x.site'
+        const previewUrl = 'https://tewianix.org'
         const previewImage = 'https://files.catbox.moe/7y3cph.jpeg'
 
         const excludedCommands = [
@@ -117,8 +105,9 @@ export default {
         }
 
         let menuText =
-            `━━━━━━━━━━━━━━━ ✿\n` +
-            `Hola, *${nombre}*\nSoy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n`
+            `━━━━━━━━━━━━━ ✿\n` +
+            `Hola, *${nombre}*\n` +
+            `Soy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
             if (commands.length === 0) continue
@@ -129,93 +118,82 @@ export default {
             menuText += `${icon} | ${catName}\n\n`
 
             for (const cmd of commands) {
-                menuText += `${usedPrefix}${cmd}\n`
+                menuText += `*${usedPrefix}${cmd}* ☁\n`
             }
 
-            menuText += `━━━━━━━━━━━━━━━ ✿\n`
+            menuText += `━━━━━━━━━━━━━ ✿\n\n`
         }
 
         menuText += `bყ ιᥲᥒᥣᥱjᥲᥒdrook16x`
 
-        try {
-            const imageBuffer = await getBuffer(previewImage)
+        let linkPreview
 
-            const media = await prepareWAMessageMedia(
-                { image: imageBuffer },
+        try {
+            const imageResponse = await fetch(previewImage)
+
+            if (!imageResponse.ok) {
+                throw new Error(`HTTP ${imageResponse.status}`)
+            }
+
+            const originalBuffer = Buffer.from(
+                await imageResponse.arrayBuffer()
+            )
+
+            const thumbnailBuffer = await sharp(originalBuffer)
+                .resize(1280, 720, {
+                    fit: 'cover',
+                    position: 'center'
+                })
+                .jpeg({
+                    quality: 90
+                })
+                .toBuffer()
+
+            const { imageMessage } = await prepareWAMessageMedia(
+                {
+                    image: thumbnailBuffer
+                },
                 {
                     upload: conn.waUploadToServer,
                     mediaTypeOverride: 'thumbnail-link'
                 }
             )
 
-            const imageMessage = media.imageMessage
+            if (imageMessage) {
+                imageMessage.width = 1280
+                imageMessage.height = 720
+            }
 
-            const getTs = (ts) =>
-                typeof ts === 'object'
-                    ? Number(ts?.low || ts)
-                    : Number(ts)
-
-            const content = {
-                extendedTextMessage: {
-                    text: menuText,
-
-                    matchedText: previewUrl,
-                    canonicalUrl: previewUrl,
-
-                    description: previewBody,
-                    title: previewTitle,
-
-                    previewType: 0,
-
-                    jpegThumbnail: imageMessage.jpegThumbnail,
-                    thumbnailDirectPath: imageMessage.directPath,
-                    thumbnailSha256: imageMessage.fileSha256,
-                    thumbnailEncSha256: imageMessage.fileEncSha256,
-                    mediaKey: imageMessage.mediaKey,
-                    mediaKeyTimestamp: getTs(
-                        imageMessage.mediaKeyTimestamp
-                    ),
-
-                    thumbnailHeight: imageMessage.height || 1080,
-                    thumbnailWidth: imageMessage.width || 1920,
-
-                    contextInfo: {}
+            linkPreview = {
+                'canonical-url': previewUrl,
+                'matched-text': previewUrl,
+                title: previewTitle,
+                description: previewBody,
+                previewType: 0,
+                jpegThumbnail: thumbnailBuffer,
+                highQualityThumbnail: imageMessage,
+                linkPreviewMetadata: {
+                    linkMediaDuration: 0,
+                    socialMediaPostType: 4
                 }
             }
 
-            const waMsg = generateWAMessageFromContent(
-                m.chat,
-                content,
-                {
-                    userJid: conn.user?.id,
-                    quoted: m
-                }
-            )
-
-            await conn.relayMessage(
-                m.chat,
-                waMsg.message,
-                {
-                    messageId: waMsg.key.id
-                }
-            )
-
         } catch (e) {
             console.error(
-                'Error al generar el link preview del menú:',
+                'Error al generar la vista previa:',
                 e
             )
-
-            // Fallback: enviar el menú normalmente si falla la preview
-            await conn.sendMessage(
-                m.chat,
-                {
-                    text: menuText
-                },
-                {
-                    quoted: m
-                }
-            )
         }
+
+        await conn.sendMessage(
+            m.chat,
+            {
+                text: `${previewUrl}\n\n${menuText}`,
+                linkPreview
+            },
+            {
+                quoted: m
+            }
+        )
     }
 }
