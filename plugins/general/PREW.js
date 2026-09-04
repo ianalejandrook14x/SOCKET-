@@ -674,7 +674,7 @@ body{margin:0;background:transparent;font-family:Arial,sans-serif;color:#fff}
 <div class="wrap">
 <div class="card">
 
-<div class="head">PLAYING WITH KANA MUSIC</div>
+<div class="head"></div>
 
 <div class="artbox">
 <img class="art" id="art" src="${card.cover}" alt="portada">
@@ -744,12 +744,12 @@ body{margin:0;background:transparent;font-family:Arial,sans-serif;color:#fff}
 </div>
 
 <div class="lrcbox">
-<h4>LETRA</h4>
+<h4>LETRA - I A N</h4>
 <div class="lrc" id="lrc"></div>
 </div>
 
 <div class="hint" id="hint">
-Toca ✦ para escuchar · toca una línea de la letra para ir a ese momento
+Toca ✦ para escuchar· toca una línea de la letra para ir a ese momento
 </div>
 
 </div>
@@ -1359,7 +1359,7 @@ function buildPayload(card) {
 
             forwardedAiBotMessageInfo: {
               botJid:
-                "867051314767696@bot",
+                "549387664077@bot",
             },
 
             forwardOrigin: 4,
@@ -1379,7 +1379,7 @@ async function run(m, { sock, text }) {
         `> Envía una URL de YouTube.\n\n` +
         `*Ejemplo:*\n` +
         `\`${m.prefix || "#"}ytmp3 https://www.youtube.com/watch?v=xxxxx\`\n\n` +
-        `También puedes usar: \`${m.prefix || "#"}hola <URL de YouTube>\``
+        `También puedes usar: \`${m.prefix || "#"}ytmp3 <URL de YouTube>\``
     );
   }
 
@@ -1478,7 +1478,7 @@ async function run(m, { sock, text }) {
 
   } catch (e) {
     console.error(
-      "[prueba23] descarga Delirius falló:",
+      "[PREW] descarga Delirius falló:",
       e?.message || e
     );
 
@@ -1487,7 +1487,7 @@ async function run(m, { sock, text }) {
     );
 
     return m.reply(
-      `✦ No pude descargar el audio: ${
+      `✦ No se pudo descargar el audio: ${
         e?.message ||
         "error desconocido"
       }`
@@ -1781,7 +1781,7 @@ async function run(m, { sock, text }) {
     );
 
     console.log(
-      `[prueba23] "${title}" vía Delirius | embebido ${
+      `[PREVIEW] "${title}" vía Delirius | embebido ${
         opusFull
           ? `opus COMPLETA (${Math.round(
               secs
