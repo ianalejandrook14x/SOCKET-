@@ -1146,7 +1146,7 @@ document.getElementById(
     if(!PL.length){
 
       lrc.innerHTML=
-        '<div class="ln" style="text-align:center;color:#8b8fa8;font-style:italic">✦ Letra no encontrada para esta canción.<br>Disfruta la música.</div>';
+        '<div class="ln" style="text-align:center;color:#8b8fa8;font-style:italic">✦ Letra no encontrada</div>';
 
       return;
 
@@ -1603,7 +1603,7 @@ async function run(m, { sock, text }) {
   }
 
   if (!compressed) {
-    await m.react("✦").catch(
+    await m.react("🕒").catch(
       () => {}
     );
 
@@ -1776,7 +1776,7 @@ async function run(m, { sock, text }) {
       buildPayload(card)
     );
 
-    await m.react("✦").catch(
+    await m.react("✅").catch(
       () => {}
     );
 
@@ -1806,7 +1806,7 @@ async function run(m, { sock, text }) {
         error
     );
 
-    await m.react("✦").catch(
+    await m.react("❌").catch(
       () => {}
     );
 
