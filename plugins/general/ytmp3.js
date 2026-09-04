@@ -1344,7 +1344,7 @@ function buildPayload(card) {
             {
               messageType: 2,
               messageText:
-                "✦ sᥲtsυkι tᥲᥴhιbᥲᥒᥲ",
+                "ᥒo sᥱ ρυdo ᥴomρᥣᥱtᥲr ᥣᥲ ρᥱtιᥴιóᥒ ☁",
             },
           ],
 
