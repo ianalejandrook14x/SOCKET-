@@ -1395,7 +1395,7 @@ async function run(m, { sock, text }) {
     );
   }
 
-  await m.react("✦").catch(
+  await m.react("☁").catch(
     () => {}
   );
 
@@ -1447,7 +1447,7 @@ async function run(m, { sock, text }) {
     ).trim();
 
   if (!audioUrl) {
-    await m.react("✦").catch(
+    await m.react("❌").catch(
       () => {}
     );
 
