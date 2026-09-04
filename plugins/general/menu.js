@@ -9,7 +9,7 @@ function getCategoryIcon(category) {
         downloader: ''
     }
 
-    return icons[category.toLowerCase()] || '🍃'
+    return icons[category.toLowerCase()] || '🎋'
 }
 
 export default {
@@ -105,9 +105,11 @@ export default {
         }
 
         let menuText =
-            `━━━━━━━━━━━━━ ✿\n` +
-            `Hola, *${nombre}*\n` +
-            `Soy *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n\n`
+            `hoᥣᥲ, *${nombre}* 🍃\n\n` +
+            `ᥱstᥱ ᥱs υᥒ bot dᥱ whᥲtsᥲρρ ᥱᥒ dᥱsᥲrroᥣᥣo, sᥱ ᥱstᥲ trᥲbᥲjᥲᥒdo ᥱᥒ sυs ρᥣυgιᥒs. \ntᥱᥒdrᥲ *dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos, ᥱtᥴ*.\n\n` +
+            `ɴᴏᴍʙʀᴇ: *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n` +
+            `ᴘʀᴇꜰɪᴊᴏ: *#*\n` +
+            `ᴅᴇᴠ: *ᴛᴇᴡɪᴀɴɪx*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
             if (commands.length === 0) continue
@@ -115,16 +117,16 @@ export default {
             const icon = getCategoryIcon(category)
             const catName = category.toUpperCase()
 
-            menuText += `${icon} | ${catName}\n\n`
+            menuText += `> ${icon} | \`${catName}\`\n\n`
 
             for (const cmd of commands) {
-                menuText += `*${usedPrefix}${cmd}* ☁\n`
+                menuText += `> *${usedPrefix}${cmd}*\n`
             }
 
-            menuText += `━━━━━━━━━━━━━ ✿\n\n`
+            menuText += `*❀━━━━━✦━━━━━❀*\n\n`
         }
 
-        menuText += `bყ ιᥲᥒᥣᥱjᥲᥒdrook16x`
+        menuText += ``
 
         let linkPreview
 
