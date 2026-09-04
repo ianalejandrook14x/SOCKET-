@@ -1818,8 +1818,8 @@ async function run(m, { sock, text }) {
 
 export default {
   command: [
-    "mp3",
     "ytmp3",
+    "mp3",
     "musica",
     "youtube",
   ],
