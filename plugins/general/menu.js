@@ -105,7 +105,7 @@ export default {
         }
 
         let menuText =
-            `hoᥣᥲ, *${nombre}* 🍃\n\n` +
+            `hoᥣᥲ, *\`${nombre}\`* 🍃\n\n` +
             `ᥱstᥱ ᥱs υᥒ bot dᥱ whᥲtsᥲρρ ᥱᥒ dᥱsᥲrroᥣᥣo, sᥱ ᥱstᥲ trᥲbᥲjᥲᥒdo ᥱᥒ sυs ρᥣυgιᥒs. \ntᥱᥒdrᥲ *dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos, ᥱtᥴ*.\n\n` +
             `ɴᴏᴍʙʀᴇ: *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n` +
             `ᴘʀᴇꜰɪᴊᴏ: *#*\n` +
@@ -117,13 +117,13 @@ export default {
             const icon = getCategoryIcon(category)
             const catName = category.toUpperCase()
 
-            menuText += `> ${icon} | \`${catName}\`\n\n`
+            menuText += `> ${icon} | *${catName}* \`೯\`\n\n`
 
             for (const cmd of commands) {
-                menuText += `> *${usedPrefix}${cmd}*\n`
+                menuText += `> *\`${usedPrefix} ${cmd}\`*\n`
             }
 
-            menuText += `*❀━━━━━✦━━━━━❀*\n\n`
+            menuText += `\n*ʚꕁꕁꕁ━━ ❀ ━━ꕁꕁꕁɞ*\n\n`
         }
 
         menuText += ``
