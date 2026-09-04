@@ -674,7 +674,7 @@ body{margin:0;background:transparent;font-family:Arial,sans-serif;color:#fff}
 <div class="wrap">
 <div class="card">
 
-<div class="head"></div>
+<div class="head">F I X X</div>
 
 <div class="artbox">
 <img class="art" id="art" src="${card.cover}" alt="portada">
