@@ -32,6 +32,7 @@
     "@hapi/boom": "^10.0.1",
     "@itsliaaa/baileys": "latest",
     "@napi-rs/canvas": "latest",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "node-cache": "*",
     "node-fetch": "*",
     "wa-sticker-formatter": "*",
