@@ -40,7 +40,8 @@
     "fluent-ffmpeg": "*",
     "os": "*",
     "fs": "*",
-    "pino": "^9.7.0"
+    "pino": "^9.7.0",
+    "sharp": "^0.34.3"
   },
   "engines": {
     "node": ">=18"
