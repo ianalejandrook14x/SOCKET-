@@ -16,7 +16,7 @@ const nose = {
 const tiktokCache = new Map()
 
 export default {
-    command: ['tiktok', 'tt', 'Tiktok', 'tik', 'tiktokaudio'],
+    command: ['test'],
 
     async run(m, { conn, args }) {
 
