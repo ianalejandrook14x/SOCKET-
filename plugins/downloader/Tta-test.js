@@ -373,7 +373,7 @@ ${sizeInfo}✦ ━━ ᴠɪꜱᴛᴀꜱ: ${repro}
                         {
                             buttonId: '#tiktokaudio',
                             buttonText: {
-                                displayText: '🎵 AUDIO'
+                                displayText: 'AUDIO'
                             },
                             type: 1
                         }
