@@ -106,7 +106,7 @@ export default {
         const botEmoji =
             typeof botConfig?.emoji === 'string' &&
             botConfig.emoji.trim()
-                ? jadConfig.emoji.trim()
+                ? botConfig.emoji.trim()
                 : '🍃'
 
 
