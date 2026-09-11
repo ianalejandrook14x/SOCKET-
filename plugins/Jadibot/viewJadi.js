@@ -13,7 +13,7 @@ export default {
             return m.reply('*No se encontrarón Jadibots.*')
         }
 
-        let texto = `     *ᴄᴏɴɴᴇᴄᴛᴇᴅ ᴊᴀᴅɪʙᴏᴛꜱ*     \n│\n`
+        let texto = `          *ᴄᴏɴɴᴇᴄᴛᴇᴅ ᴊᴀᴅɪʙᴏᴛꜱ*         \n\n\n`
 
         let contador = 1
 
@@ -22,14 +22,14 @@ export default {
             const status = isConnected ? 'ᴄᴏɴᴇᴄᴛᴀᴅᴏ' : 'ᴅᴇꜱᴄᴏɴᴇᴄᴛᴀᴅᴏ'
             
             // Limpiar el JID para mostrar solo el número limpio
-            const cleanJid = bot.jid ? bot.jid.split('@')[0] : 'Desconocido'
+            const cleanJid = bot.jid ? bot.jid.split('@')[0] : 'ᴅᴇꜱᴄᴏɴᴏᴄɪᴅᴏ'
 
-            texto += `${contador} | ${cleanJid} | ${status}`
+            texto += `*${contador}* * ${cleanJid} | *${status}*`
 
             contador++
         }
 
-        texto += `\n____________`
+        texto += `\n\n`
 
         await m.reply(texto)
     }
