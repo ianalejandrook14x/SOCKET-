@@ -5,6 +5,7 @@ import { prepareWAMessageMedia } from '@itsliaaa/baileys'
 import config from '../../config.js'
 import { getSubbotConfig } from '../../lib/subbotconfig.js'
 
+
 function getCategoryIcon(category) {
 
     const icons = {
@@ -13,9 +14,10 @@ function getCategoryIcon(category) {
 
     return (
         icons[String(category).toLowerCase()] ||
-        '☁'
+        '〆'
     )
 }
+
 
 export default {
 
@@ -27,11 +29,12 @@ export default {
         'ayuda'
     ],
 
+
     async run(
         m,
         {
             conn,
-            usedPrefix = 'sιᥒ ρrᥱfιx'
+            usedPrefix = ''
         }
     ) {
 
@@ -52,6 +55,7 @@ export default {
                 conn?.user?.id ||
                 ''
 
+
             if (!subbotJid) {
 
                 console.error(
@@ -62,6 +66,7 @@ export default {
                     '*No se pudo identificar la configuración del Jadibot.*'
                 )
             }
+
 
             botConfig =
                 getSubbotConfig(
@@ -84,9 +89,11 @@ export default {
             ) ||
             'jᥲdιbot'
 
+
         const ownerName =
             botConfig?.ownerName ||
             'tᥱwιᥲᥒιx'
+
 
         const ownerNumber =
             botConfig?.ownerNumber ||
@@ -96,14 +103,35 @@ export default {
             botConfig?.mediaUrl ||
             'https://files.catbox.moe/fhnqaa.jpg'
 
+        const jadEmoji =
+            typeof jadConfig?.emoji === 'string' &&
+            jadConfig.emoji.trim()
+                ? jadConfig.emoji.trim()
+                : '🍃'
+
+
+        const jadPrefix =
+            typeof jadConfig?.prefix === 'string'
+                ? jadConfig.prefix
+                : ''
+
+
+        const prefixDisplay =
+            botPrefix ||
+            'sιᥒ ρrᥱfιx'
+
+
         const previewTitle =
             botName
+
 
         const previewBody =
             `for ${ownerName}`
 
+
         const previewUrl =
             'https://tewianix.org'
+
 
         const previewImage =
             mediaUrl
@@ -129,13 +157,16 @@ export default {
             'wallpaper'
         ]
 
+
         const pluginsDir =
             path.join(
                 process.cwd(),
                 'jadiplugins'
             )
 
+
         const categories = {}
+
 
         try {
 
@@ -143,6 +174,7 @@ export default {
                 fs.readdirSync(
                     pluginsDir
                 )
+
 
             for (
                 const folder
@@ -155,6 +187,7 @@ export default {
                         folder
                     )
 
+
                 if (
                     !fs.statSync(
                         folderPath
@@ -162,6 +195,7 @@ export default {
                 ) {
                     continue
                 }
+
 
                 const files =
                     fs
@@ -172,6 +206,7 @@ export default {
                             file =>
                                 file.endsWith('.js')
                         )
+
 
                 for (
                     const file
@@ -184,6 +219,7 @@ export default {
                             file
                         )
 
+
                     try {
 
                         const pluginModule =
@@ -191,9 +227,11 @@ export default {
                                 `file://${filePath}?menu=${Date.now()}`
                             )
 
+
                         const plugin =
                             pluginModule.default ||
                             pluginModule
+
 
                         if (
                             !plugin ||
@@ -202,6 +240,7 @@ export default {
                             continue
                         }
 
+
                         const mainCmd =
                             Array.isArray(
                                 plugin.command
@@ -209,14 +248,17 @@ export default {
                                 ? plugin.command[0]
                                 : plugin.command
 
+
                         if (!mainCmd) {
                             continue
                         }
+
 
                         const commandName =
                             String(
                                 mainCmd
                             ).toLowerCase()
+
 
                         const isExcluded =
                             excludedCommands.some(
@@ -225,9 +267,11 @@ export default {
                                     commandName.includes(excluded)
                             )
 
+
                         if (isExcluded) {
                             continue
                         }
+
 
                         if (
                             !categories[folder]
@@ -235,9 +279,11 @@ export default {
                             categories[folder] = []
                         }
 
+
                         categories[folder].push(
                             mainCmd
                         )
+
 
                     } catch (e) {
 
@@ -249,6 +295,7 @@ export default {
                 }
             }
 
+
         } catch (e) {
 
             console.error(
@@ -257,16 +304,22 @@ export default {
             )
         }
 
+
         let menuText =
-            `hoᥣᥲ, *\`${nombre}\`* 🍃\n\n` +
+            `hoᥣᥲ, *\`${nombre}\`* ${jadEmoji}\n\n` +
             `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot tᥱᥒdrᥲ.\n` +
             `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos.\n\n` +
             `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
-            `ᴘʀᴇꜰɪᴊᴏ: *sιᥒ ρrᥱfιx*\n` +
-            `ᴅᴇᴠ: *${ownerName}*\n\n`
+            `ᴘʀᴇꜰɪᴊᴏ: *${prefixDisplay}*\n` +
+            `ᴅᴇᴠ: *${ownerName}*\n\n` +
+            `ᴇᴍᴏᴊɪ: ${jadEmoji}`
+
 
         for (
-            const [category, commands]
+            const [
+                category,
+                commands
+            ]
             of Object.entries(categories)
         ) {
 
@@ -276,16 +329,20 @@ export default {
                 continue
             }
 
+
             const icon =
                 getCategoryIcon(
                     category
                 )
 
+
             const catName =
                 category.toUpperCase()
 
+
             menuText +=
                 `> ${icon} | *${catName}* \`೯\`\n\n`
+
 
             for (
                 const cmd
@@ -293,8 +350,9 @@ export default {
             ) {
 
                 menuText +=
-                    `> *\`${usedPrefix}${cmd}\`*\n`
+                    `> *\`${botPrefix}${cmd}\`*\n`
             }
+
 
             menuText +=
                 `\n*ʚꕁꕁꕁ━━ ❀ ━━ꕁꕁꕁɞ*\n\n`
@@ -302,12 +360,14 @@ export default {
 
         let linkPreview
 
+
         try {
 
             const imageResponse =
                 await fetch(
                     previewImage
                 )
+
 
             if (
                 !imageResponse.ok
@@ -318,10 +378,12 @@ export default {
                 )
             }
 
+
             const originalBuffer =
                 Buffer.from(
                     await imageResponse.arrayBuffer()
                 )
+
 
             const thumbnailBuffer =
                 await sharp(
@@ -340,6 +402,7 @@ export default {
                     })
                     .toBuffer()
 
+
             const {
                 imageMessage
             } =
@@ -357,6 +420,7 @@ export default {
                     }
                 )
 
+
             if (
                 imageMessage
             ) {
@@ -367,6 +431,7 @@ export default {
                 imageMessage.height =
                     720
             }
+
 
             linkPreview = {
 
@@ -401,6 +466,7 @@ export default {
                 }
             }
 
+
         } catch (e) {
 
             console.error(
@@ -408,6 +474,7 @@ export default {
                 e
             )
         }
+
 
         await conn.sendMessage(
             m.chat,
