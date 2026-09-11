@@ -1,29 +1,54 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
+import { getSubbotConfig } from './lib/subbotconfig.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const pluginsPath = path.join(__dirname, 'jadiplugins')
+const __filename =
+    fileURLToPath(import.meta.url)
 
-global.jadiPlugins = global.jadiPlugins || {}
+const __dirname =
+    path.dirname(__filename)
+
+const pluginsPath =
+    path.join(
+        __dirname,
+        'jadiplugins'
+    )
+
+global.jadiPlugins =
+    global.jadiPlugins || {}
+
 
 function getAllFiles(directory) {
+
     let files = []
 
     if (!fs.existsSync(directory)) {
         return files
     }
 
-    const items = fs.readdirSync(directory)
+    const items =
+        fs.readdirSync(directory)
 
     for (const item of items) {
-        const fullPath = path.join(directory, item)
-        const stat = fs.statSync(fullPath)
+
+        const fullPath =
+            path.join(
+                directory,
+                item
+            )
+
+        const stat =
+            fs.statSync(fullPath)
 
         if (stat.isDirectory()) {
-            files.push(...getAllFiles(fullPath))
+
+            files.push(
+                ...getAllFiles(fullPath)
+            )
+
         } else {
+
             files.push(fullPath)
         }
     }
@@ -32,43 +57,63 @@ function getAllFiles(directory) {
 }
 
 export async function loadSubbotPlugins() {
+
     try {
+
         if (!fs.existsSync(pluginsPath)) {
-            fs.mkdirSync(pluginsPath, { recursive: true })
+
+            fs.mkdirSync(
+                pluginsPath,
+                {
+                    recursive: true
+                }
+            )
 
             console.log(
                 'Carpeta jadiplugins creada correctamente'
             )
         }
 
-        const files = getAllFiles(pluginsPath)
+        const files =
+            getAllFiles(
+                pluginsPath
+            )
 
         let loaded = 0
 
         for (const file of files) {
+
             if (!file.endsWith('.js')) {
                 continue
             }
 
             try {
-                const fileUrl = pathToFileURL(file).href
 
-                const imported = await import(
-                    `${fileUrl}?subbot=${Date.now()}`
-                )
+                const fileUrl =
+                    pathToFileURL(file).href
 
-                const plugin = imported.default || imported
+                const imported =
+                    await import(
+                        `${fileUrl}?subbot=${Date.now()}`
+                    )
+
+                const plugin =
+                    imported.default ||
+                    imported
 
                 if (!plugin) {
                     continue
                 }
 
-                const pluginName = path.relative(
-                    pluginsPath,
-                    file
-                )
+                const pluginName =
+                    path.relative(
+                        pluginsPath,
+                        file
+                    )
 
-                global.jadiPlugins[pluginName] = plugin
+                global.jadiPlugins[
+                    pluginName
+                ] = plugin
 
                 loaded++
 
@@ -77,6 +122,7 @@ export async function loadSubbotPlugins() {
                 )
 
             } catch (error) {
+
                 console.error(
                     `Error cargando plugin para Jadibot: ${file}`,
                     error
@@ -91,6 +137,7 @@ export async function loadSubbotPlugins() {
         return loaded
 
     } catch (error) {
+
         console.error(
             'Error cargando los plugins de Jadibots:',
             error
@@ -101,57 +148,87 @@ export async function loadSubbotPlugins() {
 }
 
 function getMessageText(m) {
-    const message = m.message
+
+    const message =
+        m.message
 
     if (!message) {
         return ''
     }
 
     if (message.conversation) {
+
         return message.conversation
     }
 
     if (message.extendedTextMessage) {
-        return message.extendedTextMessage.text || ''
+
+        return (
+            message.extendedTextMessage.text ||
+            ''
+        )
     }
 
     if (message.imageMessage) {
-        return message.imageMessage.caption || ''
+
+        return (
+            message.imageMessage.caption ||
+            ''
+        )
     }
 
     if (message.videoMessage) {
-        return message.videoMessage.caption || ''
+
+        return (
+            message.videoMessage.caption ||
+            ''
+        )
     }
 
     if (message.buttonsResponseMessage) {
+
         return (
             message.buttonsResponseMessage
-                .selectedButtonId || ''
+                .selectedButtonId ||
+            ''
         )
     }
 
     if (message.listResponseMessage) {
+
         return (
             message.listResponseMessage
                 .singleSelectReply
-                ?.selectedRowId || ''
+                ?.selectedRowId ||
+            ''
         )
     }
 
-    if (message.templateButtonReplyMessage) {
+    if (
+        message.templateButtonReplyMessage
+    ) {
+
         return (
             message.templateButtonReplyMessage
-                .selectedId || ''
+                .selectedId ||
+            ''
         )
     }
 
-    if (message.interactiveResponseMessage) {
+    if (
+        message.interactiveResponseMessage
+    ) {
+
         try {
-            const params = JSON.parse(
-                message.interactiveResponseMessage
-                    ?.nativeFlowResponseMessage
-                    ?.paramsJson || '{}'
-            )
+
+            const params =
+                JSON.parse(
+                    message
+                        .interactiveResponseMessage
+                        ?.nativeFlowResponseMessage
+                        ?.paramsJson ||
+                    '{}'
+                )
 
             return (
                 params.id ||
@@ -160,6 +237,7 @@ function getMessageText(m) {
             )
 
         } catch {
+
             return ''
         }
     }
@@ -168,22 +246,29 @@ function getMessageText(m) {
 }
 
 function getQuotedMessage(m) {
+
     const contextInfo =
-        m.message?.extendedTextMessage?.contextInfo
+        m.message
+            ?.extendedTextMessage
+            ?.contextInfo
 
     if (!contextInfo?.quotedMessage) {
         return null
     }
 
     return {
+
         key: {
-            remoteJid: m.chat,
+
+            remoteJid:
+                m.chat,
 
             fromMe:
                 contextInfo.participant ===
                 m.key?.participant,
 
-            id: contextInfo.stanzaId,
+            id:
+                contextInfo.stanzaId,
 
             participant:
                 contextInfo.participant
@@ -194,37 +279,51 @@ function getQuotedMessage(m) {
     }
 }
 
-function normalizeMessage(conn, message) {
-    const m = message
+function normalizeMessage(
+    conn,
+    message
+) {
 
-    m.id = m.key?.id
+    const m =
+        message
 
-    m.chat = m.key?.remoteJid
+    m.id =
+        m.key?.id
+
+    m.chat =
+        m.key?.remoteJid
 
     m.sender =
         m.key?.participant ||
         m.key?.remoteJid
 
-    m.fromMe = Boolean(
-        m.key?.fromMe
-    )
+    m.fromMe =
+        Boolean(
+            m.key?.fromMe
+        )
 
-    m.text = getMessageText(m)
+    m.text =
+        getMessageText(m)
 
     m.quoted =
         getQuotedMessage(m)
 
-    m.isGroup = Boolean(
-        m.chat?.endsWith('@g.us')
-    )
+    m.isGroup =
+        Boolean(
+            m.chat?.endsWith('@g.us')
+        )
 
-    m.isSubBot = true
-    m.isMainBot = false
+    m.isSubBot =
+        true
+
+    m.isMainBot =
+        false
 
     m.reply = async (
         text,
         options = {}
     ) => {
+
         return conn.sendMessage(
             m.chat,
             {
@@ -241,6 +340,7 @@ function normalizeMessage(conn, message) {
         content,
         options = {}
     ) => {
+
         return conn.sendMessage(
             m.chat,
             content,
@@ -254,6 +354,7 @@ function normalizeMessage(conn, message) {
     m.react = async (
         emoji
     ) => {
+
         return conn.sendMessage(
             m.chat,
             {
@@ -268,37 +369,141 @@ function normalizeMessage(conn, message) {
     return m
 }
 
+function getCurrentSubbotConfig(conn) {
+
+    const botJid =
+        conn?.subBotJid ||
+        conn?.user?.jid ||
+        conn?.user?.id ||
+        ''
+
+    if (!botJid) {
+
+        return {
+            prefix: '',
+            emoji: '🍃'
+        }
+    }
+
+    return getSubbotConfig(
+        botJid
+    )
+}
+
+function parseCommand(
+    text,
+    prefix
+) {
+
+    const cleanText =
+        String(text || '').trim()
+
+    if (!prefix) {
+
+        if (!cleanText) {
+            return null
+        }
+
+        return {
+            usedPrefix: '',
+            commandText: cleanText
+        }
+    }
+
+    if (
+        !cleanText.startsWith(prefix)
+    ) {
+
+        return null
+    }
+
+    const commandText =
+        cleanText
+            .slice(prefix.length)
+            .trim()
+
+    if (!commandText) {
+        return null
+    }
+
+    return {
+        usedPrefix: prefix,
+        commandText
+    }
+}
+
+
 export default async function subbotHandler(
     conn,
     message
 ) {
+
     try {
-        const m = normalizeMessage(
-            conn,
-            message
-        )
+
+        const m =
+            normalizeMessage(
+                conn,
+                message
+            )
 
         if (!m.chat) {
             return
         }
 
+
+        const botConfig =
+            getCurrentSubbotConfig(
+                conn
+            )
+
+        const prefix =
+            typeof botConfig?.prefix === 'string'
+                ? botConfig.prefix
+                : ''
+
+
         const used = {
+
             conn,
-            sock: conn,
+
+            sock:
+                conn,
 
             m,
+
             message,
 
-            isMainBot: false,
-            isSubBot: true
+            isMainBot:
+                false,
+
+            isSubBot:
+                true,
+
+            args: [],
+
+            text: '',
+
+            command: '',
+
+            usedPrefix:
+                prefix,
+
+            prefix:
+                prefix,
+
+            botConfig
         }
 
-        for (const [
-            ,
-            plugin
-        ] of Object.entries(
-            global.jadiPlugins
-        )) {
+        for (
+            const [
+                ,
+                plugin
+            ]
+            of Object.entries(
+                global.jadiPlugins
+            )
+        ) {
+
             if (
                 !plugin ||
                 plugin.disabled
@@ -306,16 +511,21 @@ export default async function subbotHandler(
                 continue
             }
 
+
             if (
                 typeof plugin.before ===
                 'function'
             ) {
+
                 try {
+
                     await plugin.before(
                         m,
                         used
                     )
+
                 } catch (error) {
+
                     console.error(
                         'Error en jadiPlugin.before:',
                         error
@@ -327,12 +537,16 @@ export default async function subbotHandler(
                 typeof plugin.all ===
                 'function'
             ) {
+
                 try {
+
                     await plugin.all(
                         m,
                         used
                     )
+
                 } catch (error) {
+
                     console.error(
                         'Error en jadiPlugin.all:',
                         error
@@ -345,25 +559,40 @@ export default async function subbotHandler(
             return
         }
 
-        const text =
-            m.text.trim()
+        const parsed =
+            parseCommand(
+                m.text,
+                prefix
+            )
 
-        if (!text) {
+        if (!parsed) {
             return
         }
 
+
+        const commandText =
+            parsed.commandText
+
+
         const parts =
-            text.split(/\s+/)
+            commandText.split(
+                /\s+/
+            )
+
 
         const command =
             parts
                 .shift()
                 .toLowerCase()
 
-        const args = parts
+
+        const args =
+            parts
+
 
         const textArgs =
             args.join(' ')
+
 
         used.args =
             args
@@ -375,17 +604,25 @@ export default async function subbotHandler(
             command
 
         used.usedPrefix =
-            ''
+            parsed.usedPrefix
 
         used.prefix =
-            ''
+            prefix
 
-        for (const [
-            ,
-            plugin
-        ] of Object.entries(
-            global.jadiPlugins
-        )) {
+
+        /*
+         * Buscar comando.
+         */
+        for (
+            const [
+                ,
+                plugin
+            ]
+            of Object.entries(
+                global.jadiPlugins
+            )
+        ) {
+
             if (
                 !plugin ||
                 plugin.disabled
@@ -393,9 +630,11 @@ export default async function subbotHandler(
                 continue
             }
 
+
             if (!plugin.command) {
                 continue
             }
+
 
             const commands =
                 Array.isArray(
@@ -404,6 +643,7 @@ export default async function subbotHandler(
                     ? plugin.command
                     : [plugin.command]
 
+
             const found =
                 commands.some(
                     cmd =>
@@ -411,6 +651,7 @@ export default async function subbotHandler(
                             .toLowerCase() ===
                         command
                 )
+
 
             if (!found) {
                 continue
@@ -426,6 +667,7 @@ export default async function subbotHandler(
                 typeof plugin.run ===
                 'function'
             ) {
+
                 await plugin.run(
                     m,
                     used
@@ -436,6 +678,7 @@ export default async function subbotHandler(
         }
 
     } catch (error) {
+
         console.error(
             'Error en jadi-handler:',
             error
