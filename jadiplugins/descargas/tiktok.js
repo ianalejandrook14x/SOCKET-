@@ -262,24 +262,24 @@ export default {
             }
 
             const caption =
-                ` ${emoji} ━━━━━━━━━ ᴛɪᴋᴛᴏᴋ ━━━━━━━━━ ${emoji}
+                `  ━━━━━━━━━ ᴛɪᴋᴛᴏᴋ ━━━━━━━━━     
 
-${emoji} ━━ tιtυᥣo: ${title}
-${emoji} ━━ ᥴrᥱᥲdor: ${authorNickname} / ${authorUsername}
-${emoji} ━━ ιd: ${id}
-${emoji} ━━ rᥱgιóᥒ: ${region}
-${emoji} ━━ dυrᥲᥴιóᥒ: ${duration}
-${sizeInfo}${emoji} ━━ vιstᥲs: ${repro}
-${emoji} ━━ ᥣιkᥱs: ${like}
-${emoji} ━━ ᥴomρᥲrtιdos: ${share}
-${emoji} ━━ ᥴomᥱᥒtᥲrιos: ${comment}
-${emoji} ━━ dᥱsᥴᥲrgᥲs: ${download}
-${emoji} ━━ ρυbᥣιᥴᥲdo: ${published}
+${emoji} ━ tιtυᥣo: ${title}
+${emoji} ━ ᥴrᥱᥲdor: ${authorNickname} / ${authorUsername}
+${emoji} ━ ιd: ${id}
+${emoji} ━ rᥱgιóᥒ: ${region}
+${emoji} ━ dυrᥲᥴιóᥒ: ${duration}
+${sizeInfo}${emoji} ━ vιstᥲs: ${repro}
+${emoji} ━ ᥣιkᥱs: ${like}
+${emoji} ━ ᥴomρᥲrtιdos: ${share}
+${emoji} ━ ᥴomᥱᥒtᥲrιos: ${comment}
+${emoji} ━ dᥱsᥴᥲrgᥲs: ${download}
+${emoji} ━ ρυbᥣιᥴᥲdo: ${published}
 
-✦ ━━━━━━━━━ ᴀᴜᴅɪᴏ ━━━━━━━━━ ✦
+✦ ━━━━━━━━ ᴀᴜᴅɪᴏ ━━━━━━━━ ✦
 
-${emoji} ━━ mυsιᥴᥲ: ${musicTitle}
-${emoji} ━━ ᥲυtor: ${musicAuthor}`
+${emoji} ━ mυsιᥴᥲ: ${musicTitle}
+${emoji} ━ ᥲυtor: ${musicAuthor}`
 
             const photos =
                 media.filter(
