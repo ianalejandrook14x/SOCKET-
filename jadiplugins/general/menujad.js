@@ -139,8 +139,8 @@ export default {
 
         let menuText =
             `hoᥣᥲ, *\`${nombre}\`* 🍃\n\n` +
-            `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot, sᥱ ᥱstᥲ ᥲᥴtυᥲᥣιzᥲᥒdo ρᥲrᥲ tᥱᥒᥱr.\n` +
-            `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos*.\n\n` +
+            `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot tᥱᥒdrᥲ.\n` +
+            `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos.\n\n` +
             `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
             `ᴘʀᴇꜰɪᴊᴏ: *sιᥒ ρrᥱfιx*\n` +
             `ᴅᴇᴠ: *${ownerName}*\n\n`
