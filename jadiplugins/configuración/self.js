@@ -74,7 +74,7 @@ export default {
 
                 `       ꜱᴇʟꜰ ᴍᴏᴅᴏ  
 
-       ᴇꜱᴛᴀᴅᴏ: *${currentSelf.toUpperCase()}*
+      ᴇꜱᴛᴀᴅᴏ: *${currentSelf.toUpperCase()}*
  
       ${usedPrefix}ꜱᴇʟꜰ ᴏɴ     
       ${usedPrefix}ꜱᴇʟꜰ ᴏꜰꜰ     `
