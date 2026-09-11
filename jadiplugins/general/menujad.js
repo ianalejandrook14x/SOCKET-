@@ -310,9 +310,9 @@ export default {
             `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot tᥱᥒdrᥲ.\n` +
             `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos.\n\n` +
             `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
-            `ᴘʀᴇꜰɪᴊᴏ: *${prefixDisplay}*\n` +
-            `ᴅᴇᴠ: *${ownerName}*\n\n` +
-            `ᴇᴍᴏᴊɪ: ${botEmoji}`
+            `ᴘʀᴇꜰɪᴊᴏ: ${prefixDisplay}\n` +
+            `ᴅᴇᴠ: *${ownerName}*\n` +
+            `ᴇᴍᴏᴊɪ: ${botEmoji}\n\n`
 
 
         for (
