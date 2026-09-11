@@ -1,39 +1,9 @@
 import {
     saveSubbotConfig,
-    getSubbotConfig
+    getSubbotConfig,
+    validateSubbotOwner
 } from '../../lib/subbotconfig.js'
-import config from '../../config.js'
 
-function cleanNumber(value) {
-    if (!value) return ''
-
-    return String(value)
-        .split('@')[0]
-        .split(':')[0]
-        .replace(/\D/g, '')
-}
-
-function getSenderNumber(m) {
-    return cleanNumber(
-        m?.sender ||
-        m?.participant ||
-        ''
-    )
-}
-
-function getMainOwners() {
-    const owners = config?.owners || []
-
-    return owners
-        .map(owner => {
-            if (Array.isArray(owner)) {
-                return cleanNumber(owner[0])
-            }
-
-            return cleanNumber(owner)
-        })
-        .filter(Boolean)
-}
 
 export default {
 
@@ -44,9 +14,19 @@ export default {
         'jadi-name'
     ],
 
-    async run(m, { conn, text }) {
 
-        if (!conn?.isSubBot && !conn?.isSubbot) {
+    async run(
+        m,
+        {
+            conn,
+            text = ''
+        }
+    ) {
+
+        if (
+            !conn?.isSubBot &&
+            !conn?.isSubbot
+        ) {
             return
         }
 
@@ -56,7 +36,9 @@ export default {
             conn?.user?.id ||
             ''
 
+
         if (!botJid) {
+
             console.error(
                 '[SETNAME] No se pudo identificar el Jadibot.'
             )
@@ -64,77 +46,79 @@ export default {
             return
         }
 
-        const botNumber = cleanNumber(botJid)
-
-        if (!botNumber) {
-            console.error(
-                '[SETNAME] No se pudo obtener el número del Jadibot.'
+        const botConfig =
+            getSubbotConfig(
+                botJid
             )
 
-            return
-        }
 
-        const subbotConfig =
-            getSubbotConfig(botNumber)
-        
-        const senderNumber =
-            getSenderNumber(m)
-
-        if (!senderNumber) {
-            console.error(
-                '[SETNAME] No se pudo identificar al usuario.'
+        const emoji =
+            String(
+                botConfig?.emoji ||
+                '🍃'
             )
 
-            return
-        }
-
-        const ownerNumber =
-            cleanNumber(
-                subbotConfig?.ownerNumber
+        const permission =
+            validateSubbotOwner(
+                m,
+                conn
             )
 
-        const mainOwners =
-            getMainOwners()
 
-        const isSubbotOwner =
-            ownerNumber &&
-            senderNumber === ownerNumber
+        if (
+            !permission?.allowed
+        ) {
 
-        const isMainOwner =
-            mainOwners.includes(senderNumber)
-
-        if (!isSubbotOwner && !isMainOwner) {
             console.log(
-                `[SETNAME] FLS ` +
-                `Jadibot: ${botNumber} | ` +
-                `Sender: ${senderNumber} | ` +
-                `Owner: ${ownerNumber || 'NO CONFIGURADO'}`
+                `[SETNAME] SIN PERMISO | ` +
+                `Jadibot: ${botJid} | ` +
+                `Sender: ${m?.sender || 'desconocido'}`
             )
 
             return
-        }
-
-        if (!text?.trim()) {
-            return m.reply(
-                '*ɪɴɢʀᴇꜱᴀ ᴇʟ ɴᴏᴍʙʀᴇ ᴘᴀʀᴀ ᴇʟ ᴊᴀᴅɪʙᴏᴛ*'
-            )
         }
 
         const newName =
-            text.trim()
+            String(
+                text || ''
+            )
+                .trim()
 
-        if (newName.length > 20) {
+
+        if (!newName) {
+
             return m.reply(
-                '*ᴇʟ ɴᴏᴍʙʀᴇ ɴᴏ ᴘᴜᴇᴅᴇ ᴛᴇɴᴇʀ ᴍᴀ́s ᴅᴇ 20 ᴄᴀʀᴀᴄᴛᴇʀᴇs.*'
+                `${emoji} *ɪɴɢʀᴇꜱᴀ ᴇʟ ɴᴏᴍʙʀᴇ ᴘᴀʀᴀ ᴇʟ ᴊᴀᴅɪʙᴏᴛ*`
             )
         }
 
-        saveSubbotConfig(botNumber, {
-            name: newName
-        })
+        if (
+            newName.length > 20
+        ) {
+
+            return m.reply(
+                `${emoji} *ᴇʟ ɴᴏᴍʙʀᴇ ɴᴏ ᴘᴜᴇᴅᴇ ᴛᴇɴᴇʀ ᴍᴀ́s ᴅᴇ 20 ᴄᴀʀᴀᴄᴛᴇʀᴇs.*`
+            )
+        }
+
+        const saved =
+            saveSubbotConfig(
+                botJid,
+                {
+                    name: newName
+                }
+            )
+
+
+        if (!saved) {
+
+            return m.reply(
+                `${emoji} *ɴᴏ ꜱᴇ ᴘᴜᴅᴏ ɢᴜᴀʀᴅᴀʀ ᴇʟ ɴᴏᴍʙʀᴇ.*`
+            )
+        }
 
         return m.reply(
-            `ɴᴏᴍʙʀᴇ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: *${newName}*`
+            `${emoji} ɴᴏᴍʙʀᴇ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: *${newName}*`
         )
     }
 }
