@@ -59,7 +59,7 @@ export default {
 
         if (!numero) {
             return m.reply(
-                '\n\n*ɪɴɢʀᴇꜱᴀ ᴜɴ ɴᴜᴍᴇʀᴏ ᴅᴇ ᴛᴇʟᴇꜰᴏɴᴏ*\n> ᴏᴛʀᴏ | -ᴍᴇ\n'
+                '\n\n*ɪɴɢʀᴇꜱᴀ ᴜɴ ɴᴜᴍᴇʀᴏ ᴅᴇ ᴛᴇʟᴇꜰᴏɴᴏ*\n> ᴏᴛʀᴏ | -ᴍᴇ\n\n'
             )
         }
 
@@ -69,7 +69,7 @@ export default {
 
         try {
             mensajeSat = await m.reply(
-                '*ꜱᴏʟɪᴄɪᴛᴀɴᴅᴏ ᴄᴏᴅɪɢᴏ.*'
+                '*ꜱᴏʟɪᴄɪᴛᴀɴᴅᴏ ᴄᴏᴅɪɢᴏ -*'
             )
         } catch (e) {
             console.error('Error enviando mensaje inicial:', e)
