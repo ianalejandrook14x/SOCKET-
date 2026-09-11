@@ -72,11 +72,12 @@ export default {
 
             return m.reply(
 
-                `       ꜱᴇʟꜰ ᴍᴏᴅᴏ       
- ᴇꜱᴛᴀᴅᴏ: *${currentSelf.toUpperCase()}*
+                `       ꜱᴇʟꜰ ᴍᴏᴅᴏ  
+
+       ᴇꜱᴛᴀᴅᴏ: *${currentSelf.toUpperCase()}*
  
- ${usedPrefix}ꜱᴇʟꜰ ᴏɴ
- ${usedPrefix}ꜱᴇʟꜰ ᴏꜰꜰ`
+      ${usedPrefix}ꜱᴇʟꜰ ᴏɴ     
+      ${usedPrefix}ꜱᴇʟꜰ ᴏꜰꜰ     `
 
             )
         }
