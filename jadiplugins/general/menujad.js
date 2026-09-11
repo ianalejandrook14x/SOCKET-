@@ -6,48 +6,110 @@ import config from '../../config.js'
 import { getSubbotConfig } from '../../lib/subbotconfig.js'
 
 function getCategoryIcon(category) {
+
     const icons = {
         general: ''
     }
 
-    return icons[category.toLowerCase()] || '☁'
+    return (
+        icons[String(category).toLowerCase()] ||
+        '☁'
+    )
 }
 
 export default {
-    command: ['menu', 'menú', 'help', 'inicio', 'ayuda'],
 
-    async run(m, { conn, usedPrefix = 'sιᥒ ρrᥱfιx' }) {
+    command: [
+        'menu',
+        'menú',
+        'help',
+        'inicio',
+        'ayuda'
+    ],
 
-        const nombre = m.pushName || 'Usuario'
+    async run(
+        m,
+        {
+            conn,
+            usedPrefix = 'sιᥒ ρrᥱfιx'
+        }
+    ) {
 
-        const defaultConfig = conn.isSubBot
-            ? getSubbotConfig(conn.subBotJid)
-            : config
+        const nombre =
+            m.pushName ||
+            'Usuario'
+
+        let botConfig
+
+        if (
+            conn?.isSubBot ||
+            conn?.isSubbot
+        ) {
+
+            const subbotJid =
+                conn?.subBotJid ||
+                conn?.user?.jid ||
+                conn?.user?.id ||
+                ''
+
+            if (!subbotJid) {
+
+                console.error(
+                    '[MENU] No se encontró conn.subBotJid para el Jadibot.'
+                )
+
+                return m.reply(
+                    '*No se pudo identificar la configuración del Jadibot.*'
+                )
+            }
+
+            botConfig =
+                getSubbotConfig(
+                    subbotJid
+                )
+
+        } else {
+
+            botConfig =
+                config
+        }
 
         const botName =
-            defaultConfig?.botName ||
-            config?.botName ||
-            'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
+            botConfig?.name ||
+            (
+                !conn?.isSubBot &&
+                !conn?.isSubbot
+                    ? config?.botName
+                    : null
+            ) ||
+            'jᥲdιbot'
 
         const ownerName =
-            defaultConfig?.ownerName ||
+            botConfig?.ownerName ||
             'tᥱwιᥲᥒιx'
 
         const ownerNumber =
-            defaultConfig?.ownerNumber ||
-            config?.ownerNumber ||
+            botConfig?.ownerNumber ||
             null
-        
+
         const mediaUrl =
-            defaultConfig?.mediaUrl ||
+            botConfig?.mediaUrl ||
             'https://files.catbox.moe/fhnqaa.jpg'
 
-        const previewTitle = botName
-        const previewBody = `for ${ownerName}`
-        const previewUrl = 'https://tewianix.org'
-        const previewImage = mediaUrl
+        const previewTitle =
+            botName
+
+        const previewBody =
+            `for ${ownerName}`
+
+        const previewUrl =
+            'https://tewianix.org'
+
+        const previewImage =
+            mediaUrl
 
         const excludedCommands = [
+
             'imagen',
             'imagenes',
             'imágenes',
@@ -67,42 +129,94 @@ export default {
             'wallpaper'
         ]
 
-        const pluginsDir = path.join(process.cwd(), 'jadiplugins')
+        const pluginsDir =
+            path.join(
+                process.cwd(),
+                'jadiplugins'
+            )
+
         const categories = {}
 
         try {
-            const folders = fs.readdirSync(pluginsDir)
 
-            for (const folder of folders) {
-                const folderPath = path.join(pluginsDir, folder)
+            const folders =
+                fs.readdirSync(
+                    pluginsDir
+                )
 
-                if (!fs.statSync(folderPath).isDirectory()) continue
+            for (
+                const folder
+                of folders
+            ) {
 
-                const files = fs
-                    .readdirSync(folderPath)
-                    .filter(file => file.endsWith('.js'))
+                const folderPath =
+                    path.join(
+                        pluginsDir,
+                        folder
+                    )
 
-                for (const file of files) {
-                    const filePath = path.join(folderPath, file)
+                if (
+                    !fs.statSync(
+                        folderPath
+                    ).isDirectory()
+                ) {
+                    continue
+                }
 
-                    try {
-                        const pluginModule = await import(
-                            `file://${filePath}?menu=${Date.now()}`
+                const files =
+                    fs
+                        .readdirSync(
+                            folderPath
+                        )
+                        .filter(
+                            file =>
+                                file.endsWith('.js')
                         )
 
+                for (
+                    const file
+                    of files
+                ) {
+
+                    const filePath =
+                        path.join(
+                            folderPath,
+                            file
+                        )
+
+                    try {
+
+                        const pluginModule =
+                            await import(
+                                `file://${filePath}?menu=${Date.now()}`
+                            )
+
                         const plugin =
-                            pluginModule.default || pluginModule
+                            pluginModule.default ||
+                            pluginModule
 
-                        if (!plugin || !plugin.command) continue
+                        if (
+                            !plugin ||
+                            !plugin.command
+                        ) {
+                            continue
+                        }
 
-                        const mainCmd = Array.isArray(plugin.command)
-                            ? plugin.command[0]
-                            : plugin.command
+                        const mainCmd =
+                            Array.isArray(
+                                plugin.command
+                            )
+                                ? plugin.command[0]
+                                : plugin.command
 
-                        if (!mainCmd) continue
+                        if (!mainCmd) {
+                            continue
+                        }
 
                         const commandName =
-                            String(mainCmd).toLowerCase()
+                            String(
+                                mainCmd
+                            ).toLowerCase()
 
                         const isExcluded =
                             excludedCommands.some(
@@ -111,15 +225,22 @@ export default {
                                     commandName.includes(excluded)
                             )
 
-                        if (isExcluded) continue
+                        if (isExcluded) {
+                            continue
+                        }
 
-                        if (!categories[folder]) {
+                        if (
+                            !categories[folder]
+                        ) {
                             categories[folder] = []
                         }
 
-                        categories[folder].push(mainCmd)
+                        categories[folder].push(
+                            mainCmd
+                        )
 
                     } catch (e) {
+
                         console.error(
                             `Error al cargar el plugin ${file} para el menú:`,
                             e
@@ -129,6 +250,7 @@ export default {
             }
 
         } catch (e) {
+
             console.error(
                 'Error al leer el directorio de plugins:',
                 e
@@ -143,16 +265,35 @@ export default {
             `ᴘʀᴇꜰɪᴊᴏ: *sιᥒ ρrᥱfιx*\n` +
             `ᴅᴇᴠ: *${ownerName}*\n\n`
 
-        for (const [category, commands] of Object.entries(categories)) {
-            if (commands.length === 0) continue
+        for (
+            const [category, commands]
+            of Object.entries(categories)
+        ) {
 
-            const icon = getCategoryIcon(category)
-            const catName = category.toUpperCase()
+            if (
+                commands.length === 0
+            ) {
+                continue
+            }
 
-            menuText += `> ${icon} | *${catName}* \`೯\`\n\n`
+            const icon =
+                getCategoryIcon(
+                    category
+                )
 
-            for (const cmd of commands) {
-                menuText += `> *\`${usedPrefix}${cmd}\`*\n`
+            const catName =
+                category.toUpperCase()
+
+            menuText +=
+                `> ${icon} | *${catName}* \`೯\`\n\n`
+
+            for (
+                const cmd
+                of commands
+            ) {
+
+                menuText +=
+                    `> *\`${usedPrefix}${cmd}\`*\n`
             }
 
             menuText +=
@@ -162,57 +303,106 @@ export default {
         let linkPreview
 
         try {
-            const imageResponse = await fetch(previewImage)
 
-            if (!imageResponse.ok) {
-                throw new Error(`HTTP ${imageResponse.status}`)
+            const imageResponse =
+                await fetch(
+                    previewImage
+                )
+
+            if (
+                !imageResponse.ok
+            ) {
+
+                throw new Error(
+                    `HTTP ${imageResponse.status}`
+                )
             }
 
-            const originalBuffer = Buffer.from(
-                await imageResponse.arrayBuffer()
-            )
+            const originalBuffer =
+                Buffer.from(
+                    await imageResponse.arrayBuffer()
+                )
 
-            const thumbnailBuffer = await sharp(originalBuffer)
-                .resize(1280, 720, {
-                    fit: 'cover',
-                    position: 'center'
-                })
-                .jpeg({
-                    quality: 90
-                })
-                .toBuffer()
+            const thumbnailBuffer =
+                await sharp(
+                    originalBuffer
+                )
+                    .resize(
+                        1280,
+                        720,
+                        {
+                            fit: 'cover',
+                            position: 'center'
+                        }
+                    )
+                    .jpeg({
+                        quality: 90
+                    })
+                    .toBuffer()
 
-            const { imageMessage } =
+            const {
+                imageMessage
+            } =
                 await prepareWAMessageMedia(
                     {
-                        image: thumbnailBuffer
+                        image:
+                            thumbnailBuffer
                     },
                     {
-                        upload: conn.waUploadToServer,
-                        mediaTypeOverride: 'thumbnail-link'
+                        upload:
+                            conn.waUploadToServer,
+
+                        mediaTypeOverride:
+                            'thumbnail-link'
                     }
                 )
 
-            if (imageMessage) {
-                imageMessage.width = 1280
-                imageMessage.height = 720
+            if (
+                imageMessage
+            ) {
+
+                imageMessage.width =
+                    1280
+
+                imageMessage.height =
+                    720
             }
 
             linkPreview = {
-                'canonical-url': previewUrl,
-                'matched-text': previewUrl,
-                title: previewTitle,
-                description: previewBody,
-                previewType: 0,
-                jpegThumbnail: thumbnailBuffer,
-                highQualityThumbnail: imageMessage,
+
+                'canonical-url':
+                    previewUrl,
+
+                'matched-text':
+                    previewUrl,
+
+                title:
+                    previewTitle,
+
+                description:
+                    previewBody,
+
+                previewType:
+                    0,
+
+                jpegThumbnail:
+                    thumbnailBuffer,
+
+                highQualityThumbnail:
+                    imageMessage,
+
                 linkPreviewMetadata: {
-                    linkMediaDuration: 0,
-                    socialMediaPostType: 4
+
+                    linkMediaDuration:
+                        0,
+
+                    socialMediaPostType:
+                        4
                 }
             }
 
         } catch (e) {
+
             console.error(
                 'Error al generar la vista previa:',
                 e
@@ -222,11 +412,14 @@ export default {
         await conn.sendMessage(
             m.chat,
             {
-                text: `${previewUrl}\n\n${menuText}`,
+                text:
+                    `${previewUrl}\n\n${menuText}`,
+
                 linkPreview
             },
             {
-                quoted: m
+                quoted:
+                    m
             }
         )
     }
