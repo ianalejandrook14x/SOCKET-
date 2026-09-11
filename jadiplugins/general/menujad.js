@@ -68,7 +68,7 @@ export default {
             'wallpaper'
         ]
 
-        const pluginsDir = path.join(process.cwd(), 'plugins')
+        const pluginsDir = path.join(process.cwd(), 'jadiplugins')
         const categories = {}
 
         try {
@@ -142,7 +142,7 @@ export default {
             `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot, sᥱ ᥱstᥲ ᥲᥴtυᥲᥣιzᥲᥒdo ρᥲrᥲ tᥱᥒᥱr.\n` +
             `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos*.\n\n` +
             `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
-            `ᴘʀᴇꜰɪᴊᴏ: *${usedPrefix}*\n` +
+            `ᴘʀᴇꜰɪᴊᴏ: *sιᥒ ρrᥱfιx*\n` +
             `ᴅᴇᴠ: *${ownerName}*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
