@@ -1,12 +1,10 @@
 import { getAllSubBots } from '../../lib/subbots.js'
 
 export default {
-    command: ['bots', 'jadibots', 'sockets'],
+    command: ['jadis', 'bots', 'jadibots', 'sockets'],
 
-    async run(m) {
+    async run(m, { conn }) {
         const subbotsObject = getAllSubBots() || {}
-        
-        // (Array)
         const botsList = Object.values(subbotsObject)
 
         if (botsList.length === 0) {
@@ -20,16 +18,33 @@ export default {
         for (const bot of botsList) {
             const isConnected = bot.connected || bot.status === 'connected'
             const status = isConnected ? 'ᴄᴏɴᴇᴄᴛᴀᴅᴏ' : 'ᴅᴇꜱᴄᴏɴᴇᴄᴛᴀᴅᴏ'
-            
-            // Limpiar el JID para mostrar solo el número limpio
-            const cleanJid = bot.jid ? bot.jid.split('@')[0] : 'ᴅᴇꜱᴄᴏɴᴏᴄɪᴅᴏ'
 
-            texto += `*${contador}* * ${cleanJid} | *${status}*`
+            // JID del usuario
+            const jid = bot.jid || ''
+            const cleanJid = jid ? jid.split('@')[0] : 'ᴅᴇꜱᴄᴏɴᴏᴄɪᴅᴏ'
+
+            // obtener el nombre
+            let nombre = cleanJid
+
+            try {
+                if (jid && conn?.getName) {
+                    const name = await conn.getName(jid)
+
+                    if (name && typeof name === 'string' && name.trim()) {
+                        nombre = name.trim()
+                    }
+                }
+            } catch (e) {
+                // Si no se puede obtener el nombre se mantiene el número
+                nombre = cleanJid
+            }
+
+            texto += `*${contador}* * ${nombre} | *${status}*\n`
 
             contador++
         }
 
-        texto += `\n\n`
+        texto += `\n`
 
         await m.reply(texto)
     }
