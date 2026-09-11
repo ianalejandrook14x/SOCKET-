@@ -120,7 +120,7 @@ export default {
 
 
         return m.reply(
-            `${newEmoji} ᴇᴍᴏᴊɪ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: ${newEmoji}`
+            `${emoji} ᴇᴍᴏᴊɪ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: ${newEmoji}`
         )
     }
 }
