@@ -103,16 +103,16 @@ export default {
             botConfig?.mediaUrl ||
             'https://files.catbox.moe/fhnqaa.jpg'
 
-        const jadEmoji =
-            typeof jadConfig?.emoji === 'string' &&
-            jadConfig.emoji.trim()
+        const botEmoji =
+            typeof botConfig?.emoji === 'string' &&
+            botConfig.emoji.trim()
                 ? jadConfig.emoji.trim()
                 : '🍃'
 
 
-        const jadPrefix =
-            typeof jadConfig?.prefix === 'string'
-                ? jadConfig.prefix
+        const botPrefix =
+            typeof botConfig?.prefix === 'string'
+                ? botConfig.prefix
                 : ''
 
 
@@ -306,13 +306,13 @@ export default {
 
 
         let menuText =
-            `hoᥣᥲ, *\`${nombre}\`* ${jadEmoji}\n\n` +
+            `hoᥣᥲ, *\`${nombre}\`* ${botEmoji}\n\n` +
             `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot tᥱᥒdrᥲ.\n` +
             `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos.\n\n` +
             `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
             `ᴘʀᴇꜰɪᴊᴏ: *${prefixDisplay}*\n` +
             `ᴅᴇᴠ: *${ownerName}*\n\n` +
-            `ᴇᴍᴏᴊɪ: ${jadEmoji}`
+            `ᴇᴍᴏᴊɪ: ${botEmoji}`
 
 
         for (
