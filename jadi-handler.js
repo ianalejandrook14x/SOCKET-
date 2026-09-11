@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
+import config from './config.js'
 import { getSubbotConfig } from './lib/subbotconfig.js'
 
 const __filename =
@@ -17,7 +18,6 @@ const pluginsPath =
 
 global.jadiPlugins =
     global.jadiPlugins || {}
-
 
 function getAllFiles(directory) {
 
@@ -335,7 +335,7 @@ function normalizeMessage(
             }
         )
     }
-
+    
     m.send = async (
         content,
         options = {}
@@ -381,13 +381,117 @@ function getCurrentSubbotConfig(conn) {
 
         return {
             prefix: '',
-            emoji: '🍃'
+            emoji: '🍃',
+            self: 'off'
         }
     }
 
     return getSubbotConfig(
         botJid
     )
+}
+
+function decodeIdentifier(target) {
+
+    if (!target) {
+        return ''
+    }
+
+    return String(target)
+        .split('@')[0]
+        .split(':')[0]
+        .replace(
+            /[^0-9]/g,
+            ''
+        )
+}
+
+function isMainOwner(senderNumber) {
+
+    if (!senderNumber) {
+        return false
+    }
+
+    const owners =
+        Array.isArray(config?.owners)
+            ? config.owners
+            : []
+
+    return owners.some(
+        owner => {
+
+            const ownerNumber =
+                decodeIdentifier(
+                    Array.isArray(owner)
+                        ? owner[0]
+                        : owner
+                )
+
+            return (
+                ownerNumber !== '' &&
+                ownerNumber === senderNumber
+            )
+        }
+    )
+}
+
+function canUseSelfMode(
+    m,
+    conn,
+    botConfig
+) {
+
+    const senderJid =
+        m?.sender ||
+        m?.key?.participant ||
+        m?.key?.remoteJid ||
+        ''
+
+    const senderNumber =
+        decodeIdentifier(
+            senderJid
+        )
+
+    if (!senderNumber) {
+        return false
+    }
+
+    if (
+        isMainOwner(
+            senderNumber
+        )
+    ) {
+
+        return true
+    }
+
+    const configuredOwner =
+        decodeIdentifier(
+            botConfig?.ownerNumber
+        )
+
+    if (
+        configuredOwner !== '' &&
+        configuredOwner === senderNumber
+    ) {
+
+        return true
+    }
+
+    const creatorNumber =
+        decodeIdentifier(
+            conn?.subbotOwner
+        )
+
+    if (
+        creatorNumber !== '' &&
+        creatorNumber === senderNumber
+    ) {
+
+        return true
+    }
+
+    return false
 }
 
 function parseCommand(
@@ -432,7 +536,6 @@ function parseCommand(
     }
 }
 
-
 export default async function subbotHandler(
     conn,
     message
@@ -450,7 +553,6 @@ export default async function subbotHandler(
             return
         }
 
-
         const botConfig =
             getCurrentSubbotConfig(
                 conn
@@ -461,6 +563,12 @@ export default async function subbotHandler(
                 ? botConfig.prefix
                 : ''
 
+        const selfMode =
+            String(
+                botConfig?.self || 'off'
+            )
+                .trim()
+                .toLowerCase()
 
         const used = {
 
@@ -491,7 +599,26 @@ export default async function subbotHandler(
             prefix:
                 prefix,
 
-            botConfig
+            botConfig,
+
+            self:
+                selfMode === 'on'
+        }
+
+        if (
+            selfMode === 'on'
+        ) {
+
+            const allowed =
+                canUseSelfMode(
+                    m,
+                    conn,
+                    botConfig
+                )
+
+            if (!allowed) {
+                return
+            }
         }
 
         for (
@@ -510,7 +637,6 @@ export default async function subbotHandler(
             ) {
                 continue
             }
-
 
             if (
                 typeof plugin.before ===
@@ -593,7 +719,6 @@ export default async function subbotHandler(
         const textArgs =
             args.join(' ')
 
-
         used.args =
             args
 
@@ -609,10 +734,6 @@ export default async function subbotHandler(
         used.prefix =
             prefix
 
-
-        /*
-         * Buscar comando.
-         */
         for (
             const [
                 ,
