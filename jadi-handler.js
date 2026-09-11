@@ -4,15 +4,16 @@ import { fileURLToPath, pathToFileURL } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+const pluginsPath = path.join(__dirname, 'jadiplugins')
 
-const pluginsPath = path.join(__dirname, 'plugins')
-
-global.plugins = global.plugins || {}
+global.jadiPlugins = global.jadiPlugins || {}
 
 function getAllFiles(directory) {
     let files = []
 
-    if (!fs.existsSync(directory)) return files
+    if (!fs.existsSync(directory)) {
+        return files
+    }
 
     const items = fs.readdirSync(directory)
 
@@ -31,41 +32,80 @@ function getAllFiles(directory) {
 }
 
 export async function loadSubbotPlugins() {
-    if (!fs.existsSync(pluginsPath)) {
-        fs.mkdirSync(pluginsPath, { recursive: true })
-    }
+    try {
+        if (!fs.existsSync(pluginsPath)) {
+            fs.mkdirSync(pluginsPath, { recursive: true })
 
-    const files = getAllFiles(pluginsPath)
-    let loaded = 0
-
-    for (const file of files) {
-        if (!file.endsWith('.js')) continue
-
-        try {
-            const fileUrl = pathToFileURL(file).href
-
-            const imported = await import(
-                `${fileUrl}?subbot=${Date.now()}`
+            console.log(
+                'Carpeta jadiplugins creada correctamente'
             )
-
-            const plugin = imported.default || imported
-            const pluginName = path.relative(pluginsPath, file)
-
-            global.plugins[pluginName] = plugin
-
-            loaded++
-        } catch (error) {
-            console.error(`Error cargando plugin para subbot: ${file}`, error)
         }
-    }
 
-    console.log(`Plugins disponibles para subbots: ${loaded}`)
+        const files = getAllFiles(pluginsPath)
+
+        let loaded = 0
+
+        for (const file of files) {
+            if (!file.endsWith('.js')) {
+                continue
+            }
+
+            try {
+                const fileUrl = pathToFileURL(file).href
+
+                const imported = await import(
+                    `${fileUrl}?subbot=${Date.now()}`
+                )
+
+                const plugin = imported.default || imported
+
+                if (!plugin) {
+                    continue
+                }
+
+                const pluginName = path.relative(
+                    pluginsPath,
+                    file
+                )
+
+                global.jadiPlugins[pluginName] = plugin
+
+                loaded++
+
+                console.log(
+                    `Plugin Jadibot cargado: ${pluginName}`
+                )
+
+            } catch (error) {
+                console.error(
+                    `Error cargando plugin para Jadibot: ${file}`,
+                    error
+                )
+            }
+        }
+
+        console.log(
+            `Plugins disponibles para Jadibots: ${loaded}`
+        )
+
+        return loaded
+
+    } catch (error) {
+        console.error(
+            'Error cargando los plugins de Jadibots:',
+            error
+        )
+
+        return 0
+    }
 }
 
 function getMessageText(m) {
     const message = m.message
 
-    if (!message) return ''
+    if (!message) {
+        return ''
+    }
 
     if (message.conversation) {
         return message.conversation
@@ -84,17 +124,25 @@ function getMessageText(m) {
     }
 
     if (message.buttonsResponseMessage) {
-        return message.buttonsResponseMessage.selectedButtonId || ''
+        return (
+            message.buttonsResponseMessage
+                .selectedButtonId || ''
+        )
     }
 
     if (message.listResponseMessage) {
-        return message.listResponseMessage
-            .singleSelectReply
-            ?.selectedRowId || ''
+        return (
+            message.listResponseMessage
+                .singleSelectReply
+                ?.selectedRowId || ''
+        )
     }
 
     if (message.templateButtonReplyMessage) {
-        return message.templateButtonReplyMessage.selectedId || ''
+        return (
+            message.templateButtonReplyMessage
+                .selectedId || ''
+        )
     }
 
     if (message.interactiveResponseMessage) {
@@ -105,7 +153,12 @@ function getMessageText(m) {
                     ?.paramsJson || '{}'
             )
 
-            return params.id || params.selectedId || ''
+            return (
+                params.id ||
+                params.selectedId ||
+                ''
+            )
+
         } catch {
             return ''
         }
@@ -125,11 +178,19 @@ function getQuotedMessage(m) {
     return {
         key: {
             remoteJid: m.chat,
-            fromMe: contextInfo.participant === m.key?.participant,
+
+            fromMe:
+                contextInfo.participant ===
+                m.key?.participant,
+
             id: contextInfo.stanzaId,
-            participant: contextInfo.participant
+
+            participant:
+                contextInfo.participant
         },
-        message: contextInfo.quotedMessage
+
+        message:
+            contextInfo.quotedMessage
     }
 }
 
@@ -137,17 +198,21 @@ function normalizeMessage(conn, message) {
     const m = message
 
     m.id = m.key?.id
+
     m.chat = m.key?.remoteJid
 
     m.sender =
         m.key?.participant ||
         m.key?.remoteJid
 
-    m.fromMe = Boolean(m.key?.fromMe)
+    m.fromMe = Boolean(
+        m.key?.fromMe
+    )
 
     m.text = getMessageText(m)
 
-    m.quoted = getQuotedMessage(m)
+    m.quoted =
+        getQuotedMessage(m)
 
     m.isGroup = Boolean(
         m.chat?.endsWith('@g.us')
@@ -156,7 +221,10 @@ function normalizeMessage(conn, message) {
     m.isSubBot = true
     m.isMainBot = false
 
-    m.reply = async (text, options = {}) => {
+    m.reply = async (
+        text,
+        options = {}
+    ) => {
         return conn.sendMessage(
             m.chat,
             {
@@ -169,7 +237,10 @@ function normalizeMessage(conn, message) {
         )
     }
 
-    m.send = async (content, options = {}) => {
+    m.send = async (
+        content,
+        options = {}
+    ) => {
         return conn.sendMessage(
             m.chat,
             content,
@@ -180,7 +251,9 @@ function normalizeMessage(conn, message) {
         )
     }
 
-    m.react = async (emoji) => {
+    m.react = async (
+        emoji
+    ) => {
         return conn.sendMessage(
             m.chat,
             {
@@ -195,11 +268,19 @@ function normalizeMessage(conn, message) {
     return m
 }
 
-export default async function subbotHandler(conn, message) {
+export default async function subbotHandler(
+    conn,
+    message
+) {
     try {
-        const m = normalizeMessage(conn, message)
+        const m = normalizeMessage(
+            conn,
+            message
+        )
 
-        if (!m.chat) return
+        if (!m.chat) {
+            return
+        }
 
         const used = {
             conn,
@@ -212,77 +293,143 @@ export default async function subbotHandler(conn, message) {
             isSubBot: true
         }
 
-        for (const [, plugin] of Object.entries(global.plugins)) {
-            if (!plugin || plugin.disabled) continue
+        for (const [
+            ,
+            plugin
+        ] of Object.entries(
+            global.jadiPlugins
+        )) {
+            if (
+                !plugin ||
+                plugin.disabled
+            ) {
+                continue
+            }
 
-            if (typeof plugin.before === 'function') {
+            if (
+                typeof plugin.before ===
+                'function'
+            ) {
                 try {
-                    await plugin.before(m, used)
+                    await plugin.before(
+                        m,
+                        used
+                    )
                 } catch (error) {
                     console.error(
-                        'Error en plugin.before del jadibot:',
+                        'Error en jadiPlugin.before:',
                         error
                     )
                 }
             }
 
-            if (typeof plugin.all === 'function') {
+            if (
+                typeof plugin.all ===
+                'function'
+            ) {
                 try {
-                    await plugin.all(m, used)
+                    await plugin.all(
+                        m,
+                        used
+                    )
                 } catch (error) {
                     console.error(
-                        'Error en plugin.all del jadibot:',
+                        'Error en jadiPlugin.all:',
                         error
                     )
                 }
             }
         }
 
+        if (!m.text) {
+            return
+        }
 
-        if (!m.text) return
+        const text =
+            m.text.trim()
 
-        const text = m.text.trim()
+        if (!text) {
+            return
+        }
 
-        if (!text) return
+        const parts =
+            text.split(/\s+/)
 
-        const parts = text.split(/\s+/)
-
-        const command = parts
-            .shift()
-            .toLowerCase()
+        const command =
+            parts
+                .shift()
+                .toLowerCase()
 
         const args = parts
 
-        const textArgs = args.join(' ')
+        const textArgs =
+            args.join(' ')
 
-        used.args = args
-        used.text = textArgs
-        used.command = command
-        used.usedPrefix = ''
-        used.prefix = ''
+        used.args =
+            args
 
-        for (const [, plugin] of Object.entries(global.plugins)) {
-            if (!plugin || plugin.disabled) continue
+        used.text =
+            textArgs
 
-            if (!plugin.command) continue
+        used.command =
+            command
 
-            const commands = Array.isArray(plugin.command)
-                ? plugin.command
-                : [plugin.command]
+        used.usedPrefix =
+            ''
 
-            const found = commands.some(
-                cmd =>
-                    String(cmd).toLowerCase() === command
-            )
+        used.prefix =
+            ''
 
-            if (!found) continue
-
-            if (plugin.onlyMainBot) {
+        for (const [
+            ,
+            plugin
+        ] of Object.entries(
+            global.jadiPlugins
+        )) {
+            if (
+                !plugin ||
+                plugin.disabled
+            ) {
                 continue
             }
 
-            if (typeof plugin.run === 'function') {
-                await plugin.run(m, used)
+            if (!plugin.command) {
+                continue
+            }
+
+            const commands =
+                Array.isArray(
+                    plugin.command
+                )
+                    ? plugin.command
+                    : [plugin.command]
+
+            const found =
+                commands.some(
+                    cmd =>
+                        String(cmd)
+                            .toLowerCase() ===
+                        command
+                )
+
+            if (!found) {
+                continue
+            }
+
+            if (
+                plugin.onlyMainBot
+            ) {
+                continue
+            }
+
+            if (
+                typeof plugin.run ===
+                'function'
+            ) {
+                await plugin.run(
+                    m,
+                    used
+                )
             }
 
             return
