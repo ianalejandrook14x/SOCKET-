@@ -99,8 +99,8 @@ export default {
             text.trim()
 
         if (
-            newPrefix.toLowerCase() === 'none' ||
-            newPrefix.toLowerCase() === 'off' ||
+            newPrefix.toLowerCase() === '' ||
+            newPrefix.toLowerCase() === ' ' ||
             newPrefix.toLowerCase() === 'noprefix' ||
             newPrefix.toLowerCase() === 'sinprefijo'
         ) {
