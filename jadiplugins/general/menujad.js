@@ -20,7 +20,6 @@ export default {
 
         const nombre = m.pushName || 'Usuario'
 
-
         const defaultConfig = conn.isSubBot
             ? getSubbotConfig(conn.subBotJid)
             : config
@@ -38,7 +37,7 @@ export default {
             defaultConfig?.ownerNumber ||
             config?.ownerNumber ||
             null
-
+        
         const mediaUrl =
             defaultConfig?.mediaUrl ||
             'https://files.catbox.moe/fhnqaa.jpg'
@@ -135,7 +134,6 @@ export default {
                 e
             )
         }
-
 
         let menuText =
             `hoᥣᥲ, *\`${nombre}\`* 🍃\n\n` +
