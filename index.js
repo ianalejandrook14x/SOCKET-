@@ -14,6 +14,10 @@ import handler, {
 } from './handler.js'
 
 import {
+    loadSubbotPlugins
+} from './jadi-handler.js'
+
+import {
     initializeAllSubBots
 } from './lib/subbots.js'
 
@@ -29,7 +33,8 @@ function createFolders() {
         './sessions/principal',
         './database',
         './database/subbots',
-        './plugins'
+        './plugins',
+        './jadiplugins'
     ]
 
 
@@ -177,6 +182,7 @@ async function startBot() {
 
 
     await loadPlugins()
+    await loadSubbotPlugins()
 
 
     console.log(`
