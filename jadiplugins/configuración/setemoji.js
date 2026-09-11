@@ -1,37 +1,9 @@
-import config from '../../config.js'
 import {
     getSubbotConfig,
-    saveSubbotConfig
+    saveSubbotConfig,
+    validateSubbotOwner
 } from '../../lib/subbotconfig.js'
 
-function cleanNumber(value) {
-    if (!value) return ''
-
-    return String(value)
-        .split('@')[0]
-        .split(':')[0]
-        .replace(/\D/g, '')
-}
-
-function getSenderNumber(m) {
-    return cleanNumber(
-        m?.sender ||
-        m?.participant ||
-        ''
-    )
-}
-
-function getMainOwners() {
-    return (config?.owners || [])
-        .map(owner => {
-            if (Array.isArray(owner)) {
-                return cleanNumber(owner[0])
-            }
-
-            return cleanNumber(owner)
-        })
-        .filter(Boolean)
-}
 
 export default {
 
@@ -41,9 +13,19 @@ export default {
         'emoji'
     ],
 
-    async run(m, { conn, text }) {
 
-        if (!conn?.isSubBot && !conn?.isSubbot) {
+    async run(
+        m,
+        {
+            conn,
+            text = ''
+        }
+    ) {
+
+        if (
+            !conn?.isSubBot &&
+            !conn?.isSubbot
+        ) {
             return
         }
 
@@ -53,64 +35,92 @@ export default {
             conn?.user?.id ||
             ''
 
-        if (!botJid) return
 
-        const botNumber =
-            cleanNumber(botJid)
+        if (!botJid) {
 
-        if (!botNumber) return
-
-        const subbotConfig =
-            getSubbotConfig(botNumber)
-
-        const senderNumber =
-            getSenderNumber(m)
-
-        if (!senderNumber) return
-
-        const ownerNumber =
-            cleanNumber(
-                subbotConfig?.ownerNumber
+            console.error(
+                '[SETEMOJI] No se pudo identificar el Jadibot.'
             )
 
-        const mainOwners =
-            getMainOwners()
-
-        const isSubbotOwner =
-            ownerNumber &&
-            senderNumber === ownerNumber
-
-        const isMainOwner =
-            mainOwners.includes(senderNumber)
-
-        if (!isSubbotOwner && !isMainOwner) {
             return
         }
 
-        if (!text?.trim()) {
+        const botConfig =
+            getSubbotConfig(
+                botJid
+            )
+
+        const emoji =
+            String(
+                botConfig?.emoji ||
+                '🍃'
+            )
+
+
+        const permission =
+            validateSubbotOwner(
+                m,
+                conn
+            )
+
+
+        if (
+            !permission?.allowed
+        ) {
+
+            console.log(
+                `[SETEMOJI] SIN PERMISO | ` +
+                `Jadibot: ${botJid} | ` +
+                `Sender: ${m?.sender || 'desconocido'}`
+            )
+
+            return
+        }
+
+
+        if (
+            !String(text).trim()
+        ) {
+
             return m.reply(
-                `ᴇᴍᴏᴊɪ ᴀᴄᴛᴜᴀʟ: ${subbotConfig?.emoji || '🍃'}`
+                `${emoji} ᴇᴍᴏᴊɪ ᴀᴄᴛᴜᴀʟ: ${emoji}`
             )
         }
 
         const newEmoji =
-            text.trim()
+            String(text)
+                .trim()
 
-        if (newEmoji.length > 10) {
+
+        if (
+            newEmoji.length > 10
+        ) {
+
             return m.reply(
-                '*ᴜsᴀ ᴜɴ ᴇᴍᴏᴊɪ ᴠᴀ́ʟɪᴅᴏ.*'
+                `${emoji} *ᴜsᴀ ᴜɴ ᴇᴍᴏᴊɪ ᴠᴀ́ʟɪᴅᴏ.*`
             )
         }
 
-        saveSubbotConfig(
-            botNumber,
-            {
-                emoji: newEmoji
-            }
-        )
+
+        const saved =
+            saveSubbotConfig(
+                botJid,
+                {
+                    emoji: newEmoji
+                }
+            )
+
+
+        if (!saved) {
+
+            return m.reply(
+                `${emoji} *ɴᴏ ꜱᴇ ᴘᴜᴅᴏ ɢᴜᴀʀᴅᴀʀ ᴇʟ ᴇᴍᴏᴊɪ.*`
+            )
+        }
+
 
         return m.reply(
-            `ᴇᴍᴏᴊɪ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: ${newEmoji}`
+            `${newEmoji} ᴇᴍᴏᴊɪ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: ${newEmoji}`
         )
     }
 }
