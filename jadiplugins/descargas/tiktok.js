@@ -34,6 +34,15 @@ export default {
             botJid
                 ? getSubbotConfig(botJid)
                 : null
+        
+        const botPrefix =
+            typeof botConfig?.prefix === 'string'
+                ? botConfig.prefix
+                : ''
+
+        const prefixDisplay =
+            botPrefix ||
+            ''
 
 
         const emoji =
@@ -50,8 +59,8 @@ export default {
             return m.reply(
                 `${emoji} *Downloader | Tiktok*\n\n` +
                 `*Uso:*\n` +
-                `*#tiktok https://vt.tiktok.com/xxxxx*\n` +
-                `*#tiktok https://vt.tiktok.com/xxxxx --hd* | Calidad HD`
+                `*${prefixDisplay}tiktok https://vt.tiktok.com/xxxxx*\n` +
+                `*${prefixDisplay}tiktok https://vt.tiktok.com/xxxxx --hd* | Calidad HD`
             )
         }
 
