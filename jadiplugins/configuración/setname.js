@@ -1,8 +1,39 @@
 import {
     saveSubbotConfig,
-    validateSubbotOwner,
     getSubbotConfig
 } from '../../lib/subbotconfig.js'
+import config from '../../config.js'
+
+function cleanNumber(value) {
+    if (!value) return ''
+
+    return String(value)
+        .split('@')[0]
+        .split(':')[0]
+        .replace(/\D/g, '')
+}
+
+function getSenderNumber(m) {
+    return cleanNumber(
+        m?.sender ||
+        m?.participant ||
+        ''
+    )
+}
+
+function getMainOwners() {
+    const owners = config?.owners || []
+
+    return owners
+        .map(owner => {
+            if (Array.isArray(owner)) {
+                return cleanNumber(owner[0])
+            }
+
+            return cleanNumber(owner)
+        })
+        .filter(Boolean)
+}
 
 export default {
 
@@ -27,15 +58,59 @@ export default {
 
         if (!botJid) {
             console.error(
-                '[SETNAME] No se pudo identificar el JID del Jadibot.'
+                '[SETNAME] No se pudo identificar el Jadibot.'
             )
 
             return
         }
 
-        const auth = validateSubbotOwner(m, conn)
+        const botNumber = cleanNumber(botJid)
 
-        if (!auth.allowed) {
+        if (!botNumber) {
+            console.error(
+                '[SETNAME] No se pudo obtener el número del Jadibot.'
+            )
+
+            return
+        }
+
+        const subbotConfig =
+            getSubbotConfig(botNumber)
+        
+        const senderNumber =
+            getSenderNumber(m)
+
+        if (!senderNumber) {
+            console.error(
+                '[SETNAME] No se pudo identificar al usuario.'
+            )
+
+            return
+        }
+
+        const ownerNumber =
+            cleanNumber(
+                subbotConfig?.ownerNumber
+            )
+
+        const mainOwners =
+            getMainOwners()
+
+        const isSubbotOwner =
+            ownerNumber &&
+            senderNumber === ownerNumber
+
+        const isMainOwner =
+            mainOwners.includes(senderNumber)
+
+        if (!isSubbotOwner && !isMainOwner) {
+            console.log(
+                `[SETNAME] FLS ` +
+                `Jadibot: ${botNumber} | ` +
+                `Sender: ${senderNumber} | ` +
+                `Owner: ${ownerNumber || 'NO CONFIGURADO'}`
+            )
+
             return
         }
 
@@ -45,7 +120,8 @@ export default {
             )
         }
 
-        const newName = text.trim()
+        const newName =
+            text.trim()
 
         if (newName.length > 20) {
             return m.reply(
@@ -53,7 +129,7 @@ export default {
             )
         }
 
-        saveSubbotConfig(botJid, {
+        saveSubbotConfig(botNumber, {
             name: newName
         })
 
