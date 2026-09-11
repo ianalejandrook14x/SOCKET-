@@ -10,36 +10,97 @@ export default {
         'código'
     ],
 
-    async run(m, { args }) {
+    async run(m, { args, conn }) {
 
-        const numero = args
-            ?.join('')
-            ?.replace(/[^0-9]/g, '')
+        let numero = null
+
+        const argumentos = args || []
+
+        // Detectar -me
+        const myNumber = argumentos.some(
+            arg => String(arg).toLowerCase() === '-me'
+        )
+
+        if (myNumber) {
+
+            const senderAlt =
+                m.key?.participantAlt ||
+                m.participantAlt ||
+                null
+
+            const sender =
+                senderAlt ||
+                m.sender ||
+                m.key?.participant ||
+                m.key?.remoteJid
+
+            if (!sender) {
+                return m.reply(
+                    '*No se pudo obtener el número.*'
+                )
+            }
+
+            numero = String(sender)
+                .split('@')[0]
+                .replace(/[^0-9]/g, '')
+
+            if (!numero) {
+                return m.reply(
+                    '*No se pudo obtener el número.*'
+                )
+            }
+
+        } else {
+
+            numero = argumentos
+                .join('')
+                .replace(/[^0-9]/g, '')
+        }
 
         if (!numero) {
             return m.reply(
-                '*Ingresa el número de telefono.*\n\n'
+                '\n\n*ɪɴɢʀᴇꜱᴀ ᴜɴ ɴᴜᴍᴇʀᴏ ᴅᴇ ᴛᴇʟᴇꜰᴏɴᴏ*\n> ᴏᴛʀᴏ | -ᴍᴇ\n'
             )
         }
 
         const jid = `${numero}@s.whatsapp.net`
 
-        await m.reply(
-            '*Solicitando código.*'
-        )
+        let mensajeSat
 
         try {
-            const safeJid = String(jid).replace(/[^a-zA-Z0-9_-]/g, '_')
-            const subbotFolder = path.join(process.cwd(), 'database', 'subbots', safeJid)
-            
+            mensajeSat = await m.reply(
+                '*ꜱᴏʟɪᴄɪᴛᴀɴᴅᴏ ᴄᴏᴅɪɢᴏ.*'
+            )
+        } catch (e) {
+            console.error('Error enviando mensaje inicial:', e)
+        }
+
+        try {
+
+            const safeJid = String(jid)
+                .replace(/[^a-zA-Z0-9_-]/g, '_')
+
+            const subbotFolder = path.join(
+                process.cwd(),
+                'database',
+                'subbots',
+                safeJid
+            )
+
             if (fs.existsSync(subbotFolder)) {
                 try {
-                    fs.rmSync(subbotFolder, { recursive: true, force: true })
+                    fs.rmSync(subbotFolder, {
+                        recursive: true,
+                        force: true
+                    })
                 } catch (e) {
-                    console.error('Error limpiando carpeta vieja:', e)
+                    console.error(
+                        'Error limpiando carpeta vieja:',
+                        e
+                    )
                 }
             }
-            
+
             const result = await initializeSubBot(
                 jid,
                 {
@@ -50,18 +111,75 @@ export default {
             )
 
             if (!result || !result.pairingCode) {
-                return m.reply(
-                    '*No se género el codigo, intenta nuevamente dentro de unos segundos*'
-                )
+
+                const errorText =
+                    '*ᥒo sᥱ ρυdo gᥱᥒᥱrᥲr ᥱᥣ ᥴodιgo, ιᥒtᥱᥒtᥲ dᥱ ᥒυᥱvo ᥱᥒ υᥒos sᥱgυᥒdos*'
+
+                try {
+                    if (mensajeSat?.edit) {
+                        await mensajeSat.edit(errorText)
+                    } else if (m.edit) {
+                        await m.edit(errorText)
+                    } else {
+                        await m.reply(errorText)
+                    }
+                } catch (e) {
+                    await m.reply(errorText)
+                }
+
+                return
             }
 
-            return m.reply(
-                `*ᥴodιgo:* *${result.pairingCode}*`
-            )
+            const codigoText =
+                `${result.pairingCode}`
+
+            try {
+
+                if (mensajeSat?.edit) {
+                    await mensajeSat.edit(codigoText)
+
+                } else if (typeof m.edit === 'function') {
+                    await m.edit(codigoText)
+
+                } else {
+                    await m.reply(codigoText)
+                }
+
+            } catch (editError) {
+
+                console.error(
+                    'Error editando mensaje:',
+                    editError
+                )
+
+                await m.reply(codigoText)
+            }
 
         } catch (error) {
-            console.error('Error en code:', error)
-            return m.reply('*Error al generar código.*')
+
+            console.error(
+                'Error en code:',
+                error
+            )
+
+            const errorText =
+                '*Error al generar código.*'
+
+            try {
+
+                if (mensajeSat?.edit) {
+                    await mensajeSat.edit(errorText)
+
+                } else if (typeof m.edit === 'function') {
+                    await m.edit(errorText)
+
+                } else {
+                    await m.reply(errorText)
+                }
+
+            } catch (e) {
+                await m.reply(errorText)
+            }
         }
     }
 }
