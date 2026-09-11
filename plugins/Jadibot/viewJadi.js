@@ -39,7 +39,7 @@ export default {
                 nombre = cleanJid
             }
 
-            texto += `*${contador}* * ${nombre} | *${status}*\n`
+            texto += `*〆*  ${nombre} | *${status}*\n`
 
             contador++
         }
