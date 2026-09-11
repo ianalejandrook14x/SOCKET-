@@ -2,11 +2,12 @@ import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
 import { prepareWAMessageMedia } from '@itsliaaa/baileys'
+import config from '../../config.js'
+import { getSubbotConfig } from '../../lib/subbotconfig.js'
 
 function getCategoryIcon(category) {
     const icons = {
-        general: '',
-        downloader: ''
+        general: ''
     }
 
     return icons[category.toLowerCase()] || '☁'
@@ -15,13 +16,37 @@ function getCategoryIcon(category) {
 export default {
     command: ['menu', 'menú', 'help', 'inicio', 'ayuda'],
 
-    async run(m, { conn, usedPrefix = '.' }) {
+    async run(m, { conn, usedPrefix = 'sιᥒ ρrᥱfιx' }) {
+
         const nombre = m.pushName || 'Usuario'
 
-        const previewTitle = 'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
-        const previewBody = 'for tᥱwιᥲᥒιx'
+
+        const defaultConfig = conn.isSubBot
+            ? getSubbotConfig(conn.subBotJid)
+            : config
+
+        const botName =
+            defaultConfig?.botName ||
+            config?.botName ||
+            'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
+
+        const ownerName =
+            defaultConfig?.ownerName ||
+            'tᥱwιᥲᥒιx'
+
+        const ownerNumber =
+            defaultConfig?.ownerNumber ||
+            config?.ownerNumber ||
+            null
+
+        const mediaUrl =
+            defaultConfig?.mediaUrl ||
+            'https://files.catbox.moe/fhnqaa.jpg'
+
+        const previewTitle = botName
+        const previewBody = `for ${ownerName}`
         const previewUrl = 'https://tewianix.org'
-        const previewImage = 'https://files.catbox.moe/7y3cph.jpeg'
+        const previewImage = mediaUrl
 
         const excludedCommands = [
             'imagen',
@@ -62,8 +87,12 @@ export default {
                     const filePath = path.join(folderPath, file)
 
                     try {
-                        const pluginModule = await import(`file://${filePath}`)
-                        const plugin = pluginModule.default || pluginModule
+                        const pluginModule = await import(
+                            `file://${filePath}?menu=${Date.now()}`
+                        )
+
+                        const plugin =
+                            pluginModule.default || pluginModule
 
                         if (!plugin || !plugin.command) continue
 
@@ -73,13 +102,15 @@ export default {
 
                         if (!mainCmd) continue
 
-                        const commandName = String(mainCmd).toLowerCase()
+                        const commandName =
+                            String(mainCmd).toLowerCase()
 
-                        const isExcluded = excludedCommands.some(
-                            excluded =>
-                                commandName === excluded ||
-                                commandName.includes(excluded)
-                        )
+                        const isExcluded =
+                            excludedCommands.some(
+                                excluded =>
+                                    commandName === excluded ||
+                                    commandName.includes(excluded)
+                            )
 
                         if (isExcluded) continue
 
@@ -97,6 +128,7 @@ export default {
                     }
                 }
             }
+
         } catch (e) {
             console.error(
                 'Error al leer el directorio de plugins:',
@@ -104,12 +136,14 @@ export default {
             )
         }
 
+
         let menuText =
             `hoᥣᥲ, *\`${nombre}\`* 🍃\n\n` +
-            `ᥱstᥱ ᥱs υᥒ bot dᥱ whᥲtsᥲρρ ᥱᥒ dᥱsᥲrroᥣᥣo, sᥱ ᥱstᥲ trᥲbᥲjᥲᥒdo ᥱᥒ sυs ρᥣυgιᥒs. \ntᥱᥒdrᥲ *dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos, ᥱtᥴ*.\n\n` +
-            `ɴᴏᴍʙʀᴇ: *sᥲtsυkι tᥲᥴhιbᥲᥒᥲ*\n` +
-            `ᴘʀᴇꜰɪᴊᴏ: *#*\n` +
-            `ᴅᴇᴠ: *ᴛᴇᴡɪᴀɴɪx*\n\n`
+            `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot, sᥱ ᥱstᥲ ᥲᥴtυᥲᥣιzᥲᥒdo ρᥲrᥲ tᥱᥒᥱr.\n` +
+            `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos*.\n\n` +
+            `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
+            `ᴘʀᴇꜰɪᴊᴏ: *${usedPrefix}*\n` +
+            `ᴅᴇᴠ: *${ownerName}*\n\n`
 
         for (const [category, commands] of Object.entries(categories)) {
             if (commands.length === 0) continue
@@ -120,13 +154,12 @@ export default {
             menuText += `> ${icon} | *${catName}* \`೯\`\n\n`
 
             for (const cmd of commands) {
-                menuText += `> *\`${usedPrefix} ${cmd}\`*\n`
+                menuText += `> *\`${usedPrefix}${cmd}\`*\n`
             }
 
-            menuText += `\n*ʚꕁꕁꕁ━━ ❀ ━━ꕁꕁꕁɞ*\n\n`
+            menuText +=
+                `\n*ʚꕁꕁꕁ━━ ❀ ━━ꕁꕁꕁɞ*\n\n`
         }
-
-        menuText += ``
 
         let linkPreview
 
@@ -151,15 +184,16 @@ export default {
                 })
                 .toBuffer()
 
-            const { imageMessage } = await prepareWAMessageMedia(
-                {
-                    image: thumbnailBuffer
-                },
-                {
-                    upload: conn.waUploadToServer,
-                    mediaTypeOverride: 'thumbnail-link'
-                }
-            )
+            const { imageMessage } =
+                await prepareWAMessageMedia(
+                    {
+                        image: thumbnailBuffer
+                    },
+                    {
+                        upload: conn.waUploadToServer,
+                        mediaTypeOverride: 'thumbnail-link'
+                    }
+                )
 
             if (imageMessage) {
                 imageMessage.width = 1280
