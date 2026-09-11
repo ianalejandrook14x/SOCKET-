@@ -1,48 +1,32 @@
 import {
     getSubbotConfig,
-    saveSubbotConfig
+    saveSubbotConfig,
+    validateSubbotOwner
 } from '../../lib/subbotconfig.js'
 
-function cleanNumber(value) {
-    if (!value) return ''
-
-    return String(value)
-        .split('@')[0]
-        .split(':')[0]
-        .replace(/\D/g, '')
-}
-
-function getSenderNumber(m) {
-    return cleanNumber(
-        m?.sender ||
-        m?.participant ||
-        ''
-    )
-}
-
-function getMainOwners(config) {
-    return (config?.owners || [])
-        .map(owner => {
-            if (Array.isArray(owner)) {
-                return cleanNumber(owner[0])
-            }
-
-            return cleanNumber(owner)
-        })
-        .filter(Boolean)
-}
 
 export default {
 
     command: [
         'setprefix',
         'setprefijo',
-        'prefijo'
+        'prefijo',
+        'prefix'
     ],
 
-    async run(m, { conn, text }) {
 
-        if (!conn?.isSubBot && !conn?.isSubbot) {
+    async run(
+        m,
+        {
+            conn,
+            text = ''
+        }
+    ) {
+
+        if (
+            !conn?.isSubBot &&
+            !conn?.isSubbot
+        ) {
             return
         }
 
@@ -52,86 +36,123 @@ export default {
             conn?.user?.id ||
             ''
 
-        if (!botJid) return
 
-        const botNumber =
-            cleanNumber(botJid)
+        if (!botJid) {
 
-        if (!botNumber) return
-
-        const subbotConfig =
-            getSubbotConfig(botNumber)
-
-        const senderNumber =
-            getSenderNumber(m)
-
-        if (!senderNumber) return
-
-        const ownerNumber =
-            cleanNumber(
-                subbotConfig?.ownerNumber
+            console.error(
+                '[SETPREFIX] No se pudo identificar el Jadibot.'
             )
 
-        const mainOwners =
-            getMainOwners(
-                await import('../../config.js')
-                    .then(module => module.default)
-            )
-
-        const isSubbotOwner =
-            ownerNumber &&
-            senderNumber === ownerNumber
-
-        const isMainOwner =
-            mainOwners.includes(senderNumber)
-
-        if (!isSubbotOwner && !isMainOwner) {
             return
         }
 
-        if (text === undefined || text === null) {
+
+        const botConfig =
+            getSubbotConfig(
+                botJid
+            )
+
+        const emoji =
+            String(
+                botConfig?.emoji ||
+                '🍃'
+            )
+
+        const permission =
+            validateSubbotOwner(
+                m,
+                conn
+            )
+
+
+        if (
+            !permission?.allowed
+        ) {
+
+            console.log(
+                `[SETPREFIX] SIN PERMISO | ` +
+                `Jadibot: ${botJid} | ` +
+                `Sender: ${m?.sender || 'desconocido'}`
+            )
+
+            return
+        }
+
+        if (
+            text === undefined ||
+            text === null ||
+            String(text).trim() === ''
+        ) {
+
             return m.reply(
-                `ᴘʀᴇꜰɪᴊᴏ ᴀᴄᴛᴜᴀʟ: *${subbotConfig.prefix || 'sin prefijo'}*`
+                `${emoji} ᴘʀᴇꜰɪᴊᴏ ᴀᴄᴛᴜᴀʟ: *${
+                    botConfig?.prefix || 'ꜱɪɴ ᴘʀᴇꜰɪx'
+                }*`
             )
         }
 
         const newPrefix =
-            text.trim()
+            String(text)
+                .trim()
+
 
         if (
             newPrefix.toLowerCase() === '' ||
             newPrefix.toLowerCase() === ' ' ||
-            newPrefix.toLowerCase() === 'noprefix' ||
-            newPrefix.toLowerCase() === 'sinprefijo'
+            newPrefix.toLowerCase() === 'no'
         ) {
 
+            const saved =
+                saveSubbotConfig(
+                    botJid,
+                    {
+                        prefix: ''
+                    }
+                )
+
+
+            if (!saved) {
+
+                return m.reply(
+                    `${emoji} *ɴᴏ ꜱᴇ ᴘᴜᴅᴏ ɢᴜᴀʀᴅᴀʀ ᴇʟ ᴘʀᴇꜰɪᴊᴏ.*`
+                )
+            }
+
+
+            return m.reply(
+                `${emoji} ᴘʀᴇꜰɪᴊᴏ ᴅᴇʟ ᴊᴀᴅɪʙᴏᴛ: *sɪɴ ᴘʀᴇꜰɪᴊᴏ*`
+            )
+        }
+
+
+        if (
+            newPrefix.length > 3
+        ) {
+
+            return m.reply(
+                `${emoji} *ᴇʟ ᴘʀᴇꜰɪᴊᴏ ɴᴏ ᴘᴜᴇᴅᴇ ᴛᴇɴᴇʀ ᴍᴀ́s ᴅᴇ 3 ᴄᴀʀᴀᴄᴛᴇʀᴇs.*`
+            )
+        }
+
+
+        const saved =
             saveSubbotConfig(
-                botNumber,
+                botJid,
                 {
-                    prefix: ''
+                    prefix: newPrefix
                 }
             )
 
+
+        if (!saved) {
+
             return m.reply(
-                'ᴘʀᴇꜰɪᴊᴏ ᴅᴇʟ ᴊᴀᴅɪʙᴏᴛ: *sɪɴ ᴘʀᴇꜰɪᴊᴏ*'
+                `${emoji} *ɴᴏ ꜱᴇ ᴘᴜᴅᴏ ɢᴜᴀʀᴅᴀʀ ᴇʟ ᴘʀᴇꜰɪᴊᴏ.*`
             )
         }
-
-        if (newPrefix.length > 3) {
-            return m.reply(
-                '*ᴇʟ ᴘʀᴇꜰɪᴊᴏ ɴᴏ ᴘᴜᴇᴅᴇ ᴛᴇɴᴇʀ ᴍᴀ́s ᴅᴇ 3 ᴄᴀʀᴀᴄᴛᴇʀᴇs.*'
-            )
-        }
-
-        saveSubbotConfig(
-            botNumber,
-            {
-                prefix: newPrefix
-            }
-        )
 
         return m.reply(
-            `ᴘʀᴇꜰɪᴊᴏ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: *${newPrefix}*`
+            `${emoji} ᴘʀᴇꜰɪᴊᴏ ᴄᴀᴍʙɪᴀᴅᴏ ᴀ: *${newPrefix}*`
         )
     }
 }
