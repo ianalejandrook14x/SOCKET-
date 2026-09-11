@@ -27,11 +27,11 @@ export default {
         const botName =
             defaultConfig?.botName ||
             config?.botName ||
-            null
+            'sᥲtsυkι tᥲᥴhιbᥲᥒᥲ'
 
         const ownerName =
             defaultConfig?.ownerName ||
-            null
+            'tᥱwιᥲᥒιx'
 
         const ownerNumber =
             defaultConfig?.ownerNumber ||
@@ -40,7 +40,7 @@ export default {
         
         const mediaUrl =
             defaultConfig?.mediaUrl ||
-            null
+            'https://files.catbox.moe/fhnqaa.jpg'
 
         const previewTitle = botName
         const previewBody = `for ${ownerName}`
