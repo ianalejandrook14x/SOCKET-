@@ -59,8 +59,8 @@ export default {
             return m.reply(
                 `${emoji} *Downloader | Tiktok*\n\n` +
                 `*Uso:*\n` +
-                `*${prefixDisplay}tiktok https://vt.tiktok.com/xxxxx*\n` +
-                `*${prefixDisplay}tiktok https://vt.tiktok.com/xxxxx --hd* | Calidad HD`
+                `*${prefixDisplay}tiktok https://vt.tiktok.com/xxxx*\n` +
+                `*${prefixDisplay}tiktok https://vt.tiktok.com/xxxx --hd | Calidad HD*`
             )
         }
 
