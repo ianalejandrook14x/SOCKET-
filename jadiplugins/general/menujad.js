@@ -27,9 +27,11 @@ export default {
         const botName =
             defaultConfig?.botName ||
             config?.botName ||
+            null
 
         const ownerName =
             defaultConfig?.ownerName ||
+            null
 
         const ownerNumber =
             defaultConfig?.ownerNumber ||
@@ -38,6 +40,7 @@ export default {
         
         const mediaUrl =
             defaultConfig?.mediaUrl ||
+            null
 
         const previewTitle = botName
         const previewBody = `for ${ownerName}`
