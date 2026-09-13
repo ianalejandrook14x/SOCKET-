@@ -1,4 +1,8 @@
-import { getSubbotConfig, saveSubbotConfig, validateSubbotOwner } from '../../lib/subbotconfig.js'
+import {
+    getSubbotConfig,
+    saveSubbotConfig,
+    validateSubbotOwner
+} from '../../lib/subbotconfig.js'
 
 const CATBOX_URL = 'https://catbox.moe/user/api'
 
@@ -6,189 +10,111 @@ async function uploadToCatbox(buffer, filename = 'banner.jpg') {
     const form = new FormData()
 
     form.append('reqtype', 'fileupload')
+    form.append('fileToUpload', new Blob([buffer]), filename)
 
-    form.append(
-        'fileToUpload',
-        new Blob([buffer]),
-        filename
-    )
+    const response = await fetch(CATBOX_URL, {
+        method: 'POST',
+        body: form
+    })
 
-    const response = await fetch(
-        CATBOX_URL,
-        {
-            method: 'POST',
-            body: form
-        }
-    )
+    const result = (await response.text()).trim()
 
     if (!response.ok) {
-        throw new Error(
-            `Catbox respondió con HTTP ${response.status}`
-        )
+        throw new Error(`Catbox respondió con HTTP ${response.status}: ${result}`)
     }
 
-    const result = (
-        await response.text()
-    ).trim()
-
-    if (
-        !result ||
-        !result.startsWith('https://files.catbox.moe/')
-    ) {
-        throw new Error(
-            `Respuesta inválida de Catbox: ${result}`
-        )
+    if (!result || !result.startsWith('https://files.catbox.moe/')) {
+        throw new Error(`Catbox devolvió una respuesta inválida: ${result}`)
     }
 
     return result
 }
 
-async function getImageFromQuotedMessage(m) {
+async function getQuotedImage(m) {
     const quoted = m?.quoted
 
     if (!quoted) {
         return null
     }
 
-    const message =
-        quoted?.message ||
-        quoted?.msg ||
-        {}
+    const type = quoted?.mtype || quoted?.type || quoted?.message?.imageMessage ? 'imageMessage' : ''
 
-    const imageMessage =
-        message?.imageMessage ||
-        (
-            quoted?.mtype === 'imageMessage'
-                ? message
-                : null
-        )
-
-    if (!imageMessage) {
+    if (quoted?.mtype && quoted.mtype !== 'imageMessage') {
         return null
     }
 
-    if (typeof quoted.download === 'function') {
-        const buffer =
-            await quoted.download()
-
-        if (buffer) {
-            return buffer
-        }
+    if (typeof quoted.download !== 'function') {
+        return null
     }
 
-    return null
+    const buffer = await quoted.download()
+
+    if (!buffer) {
+        return null
+    }
+
+    return buffer
 }
 
-const handler = async (
-    m,
-    {
-        conn,
-        args
-    }
-) => {
+const handler = async (m, { conn, args }) => {
     try {
-
-        const botJid =
-            conn?.subBotJid ||
-            conn?.user?.jid ||
-            conn?.user?.id ||
-            ''
+        const botJid = conn?.subBotJid || conn?.user?.jid || conn?.user?.id || ''
 
         if (!botJid) {
-            return m.reply(
-                '*No se pudo identificar el Jadibot.*'
-            )
+            return m.reply('*No se pudo identificar el Jadibot.*')
         }
 
-        const allowed =
-            await validateSubbotOwner(
-                m,
-                conn
-            )
+        const allowed = await validateSubbotOwner(m, conn)
 
         if (!allowed) {
             return
         }
 
-        const currentConfig =
-            getSubbotConfig(
-                botJid,
-                {}
-            )
+        const currentConfig = getSubbotConfig(botJid, {})
 
-        if (args.length > 0) {
+        if (args?.length) {
+            const url = args.join(' ').trim()
 
-            const url =
-                args.join(' ').trim()
-
-            if (
-                !/^https?:\/\//i.test(url)
-            ) {
+            if (!/^https?:\/\//i.test(url)) {
                 return m.reply(
-                    '*La URL no es válida*'
+                    'Url no invalida w'
                 )
             }
 
-            await saveSubbotConfig(
-                botJid,
-                {
-                    ...currentConfig,
-                    mediaUrl: url
-                }
-            )
+            await saveSubbotConfig(botJid, {
+                ...currentConfig,
+                mediaUrl: url
+            })
 
-            return m.reply(
-                '*Banner actualizado correctamente.*\n\n' +
-                `> ${url}`
-            )
+            return m.reply('*Banner actualizado correctamente.*')
         }
 
-        const imageBuffer =
-            await getImageFromQuotedMessage(m)
+        const imageBuffer = await getQuotedImage(m)
 
         if (!imageBuffer) {
             return m.reply(
-                '*Responde a una imagen o URL*'
+                'Responde a una imagen w'
             )
         }
 
-        await m.reply(
-            '*Subiendo imagen*'
-        )
+        const catboxUrl = await uploadToCatbox(imageBuffer, 'jadibot-banner.jpg')
 
+        await saveSubbotConfig(botJid, {
+            ...currentConfig,
+            mediaUrl: catboxUrl
+        })
 
-        const catboxUrl =
-            await uploadToCatbox(
-                imageBuffer,
-                'jadibot-banner.jpg'
-            )
-
-        await saveSubbotConfig(
-            botJid,
-            {
-                ...currentConfig,
-                mediaUrl: catboxUrl
-            }
-        )
-
-        return m.reply(
-            '*Imagen del Jadbot actualizada.*'
-        )
+        return m.reply('*Banner actualizado correctamente.*')
 
     } catch (error) {
-
-        console.error(
-            'Error en setbanner:',
-            error
-        )
+        console.error('[SETBANNER]', error)
 
         return m.reply(
             '*No se pudo actualizar el banner.*\n\n' +
-            `> ${error.message || error}`
+            `> ${error?.message || error}`
         )
     }
 }
-
 handler.command = ['setbanner', 'setimage', 'imagen']
 
 export default handler
