@@ -1,5 +1,5 @@
 /*
-Configuraciones globales.
+Configuraciones globales
 */
 
 export const config = {
