@@ -18,6 +18,12 @@ export default {
 
     const botConfig = getSubbotConfig(botJid)
 
+    const botEmoji =
+    typeof botConfig?.emoji === 'string' &&
+        botConfig.emoji.trim()
+        ? botConfig.emoji.trim()
+              : '🍃'
+
     const validOwner = validateSubbotOwner(m, conn)
 
     if (!validOwner) return
@@ -30,9 +36,9 @@ export default {
     const option = args?.[0]?.toLowerCase()
 
     if (!option) {
-      const selfText = `ᥱᥣ modo sᥱᥣf ᥱs ρᥲrᥲ ᥲᥴtιvᥲr o dᥱsᥲᥴtιvᥲr ᥱᥣ modo ρrιvᥲdo dᥱᥣ jᥲdιbot ᥱstᥲbᥣᥱᥴᥱrᥣo ᥴomo ρúbᥣιᥴo o ρrιvᥲdo. 
+      const selfText = `ᥱᥣ modo sᥱᥣf ᥱs ρᥲrᥲ ᥲᥴtιvᥲr o dᥱsᥲᥴtιvᥲr ᥱᥣ modo ρrιvᥲdo dᥱᥣ jᥲdιbot ᥱstᥲbᥣᥱᥴᥱrᥣo ᥴomo ρúbᥣιᥴo o ρrιvᥲdo. ${botEmoji}
 
-ᥱstᥲdo ᥲᥴtυᥲᥣ: *${currentSelf.toUpperCase()}*
+ᥱstᥲdo ᥲᥴtυᥲᥣ: *${currentSelf.toUpperCase()}* ${botEmoji}
 
 ${usedPrefix}sᥱᥣf oᥒ
 ${usedPrefix}sᥱᥣf off
