@@ -37,6 +37,7 @@ export default {
             )
         }
 
+
         const botJid =
             conn?.subBotJid ||
             conn?.user?.jid ||
@@ -50,6 +51,7 @@ export default {
                 '*No se pudo identificar la sesión del Jadibot*'
             )
         }
+
 
         const botConfig =
             getSubbotConfig(
@@ -66,21 +68,60 @@ export default {
                 .toLowerCase()
 
 
+        const previewUrl =
+            String(
+                botConfig?.mediaUrl ||
+                ''
+            )
+                .trim()
+
+
         if (
             !args.length
         ) {
 
-            return m.reply(
-
+            const selfText =
                 `       ꜱᴇʟꜰ ᴍᴏᴅᴏ  
 
       ᴇꜱᴛᴀᴅᴏ: *${currentSelf.toUpperCase()}*
  
       ${usedPrefix}ꜱᴇʟꜰ ᴏɴ     
-      ${usedPrefix}ꜱᴇʟꜰ ᴏꜰꜰ     `
+      ${usedPrefix}ꜱᴇʟꜰ ᴏꜰꜰ`
 
+
+            if (
+                previewUrl
+            ) {
+
+                return conn.sendMessage(
+                    m.chat,
+                    {
+                        text:
+                            `${previewUrl}\n\n${selfText}`,
+                        contextInfo: {
+                            externalAdReply: {
+                                title: 'ꜱᴇʟꜰ ᴍᴏᴅᴏ',
+                                body: `ᴇꜱᴛᴀᴅᴏ: ${currentSelf.toUpperCase()}`,
+                                mediaType: 1,
+                                renderLargerThumbnail: true,
+                                showAdAttribution: false,
+                                sourceUrl: previewUrl,
+                                thumbnailUrl: previewUrl
+                            }
+                        }
+                    },
+                    {
+                        quoted: m
+                    }
+                )
+            }
+
+
+            return m.reply(
+                selfText
             )
         }
+
 
         const action =
             String(
@@ -120,6 +161,7 @@ export default {
                 )
             }
 
+
             return m.reply(
 
                 `       *ꜱᴇʟꜰ ᴀᴄᴛɪᴠᴏ*       
@@ -129,6 +171,7 @@ export default {
 
             )
         }
+
 
         if (
             action === 'off'
@@ -170,6 +213,7 @@ export default {
 
             )
         }
+
 
         return m.reply(
 
