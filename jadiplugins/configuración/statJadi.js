@@ -2,8 +2,6 @@ import sharp from 'sharp'
 import { prepareWAMessageMedia } from '@itsliaaa/baileys'
 import { getSubbotConfig } from '../../lib/subbotconfig.js'
 
-const subbotStartTimes = new Map()
-
 function getBotJid(conn) {
   return (
     conn.subBotJid ||
@@ -11,62 +9,6 @@ function getBotJid(conn) {
     conn.user?.id ||
     ''
   )
-}
-
-function getRealBotName(conn, botConfig) {
-  const realName =
-    conn.user?.name ||
-    conn.user?.verifiedName ||
-    conn.user?.notify ||
-    ''
-
-  if (
-    typeof realName === 'string' &&
-    realName.trim()
-  ) {
-    return realName.trim()
-  }
-
-  return (
-    botConfig?.botName ||
-    'jᥲdιbot'
-  )
-}
-
-function formatUptime(startTime) {
-  const elapsed = Date.now() - startTime
-
-  const seconds = Math.floor(elapsed / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-
-  const remainingHours = hours % 24
-  const remainingMinutes = minutes % 60
-  const remainingSeconds = seconds % 60
-
-  const parts = []
-
-  if (days > 0) {
-    parts.push(`${days}d`)
-  }
-
-  if (remainingHours > 0) {
-    parts.push(`${remainingHours}h`)
-  }
-
-  if (remainingMinutes > 0) {
-    parts.push(`${remainingMinutes}m`)
-  }
-
-  if (
-    remainingSeconds > 0 ||
-    parts.length === 0
-  ) {
-    parts.push(`${remainingSeconds}s`)
-  }
-
-  return parts.join(' ')
 }
 
 export default {
@@ -82,25 +24,16 @@ export default {
       )
     }
 
-    if (!subbotStartTimes.has(botJid)) {
-      subbotStartTimes.set(
-        botJid,
-        Date.now()
-      )
-    }
-
     const botConfig =
       getSubbotConfig(botJid)
 
     const botName =
-      getRealBotName(
-        conn,
-        botConfig
-      )
+      botConfig?.botName ||
+      'jᥲdιbot'
 
     const prefix =
       botConfig?.prefix ||
-      'Sin prefijo'
+      'sιᥒ ρrᥱfιjo'
 
     const emoji =
       botConfig?.emoji ||
@@ -111,16 +44,10 @@ export default {
         ? 'ρrιvᥲdo'
         : 'ρυbᥣιᥴo'
 
-    const startTime =
-      subbotStartTimes.get(botJid)
-
-    const uptime =
-      formatUptime(startTime)
-
     const statText = `
 ᴇꜱᴛᴀᴅɪꜱᴛɪᴄᴀꜱ ᴅᴇʟ ᴊᴀᴅɪʙᴏᴛ
 
-ᥒombrᥱ ρrᥱfιjo: *${botName}*
+ᥒombrᥱ: *${botName}*
 ρrᥱfιjo: *${prefix}*
 ᥱmojι: *${emoji}*
 modo: *${selfMode}*`.trim()
