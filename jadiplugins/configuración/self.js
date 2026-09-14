@@ -30,13 +30,12 @@ export default {
     const option = args?.[0]?.toLowerCase()
 
     if (!option) {
-      const selfText = `ᥱᥣ modo sᥱᥣf ᥱs ρᥲrᥲ ᥲᥴtιvᥲr o dᥱsᥲᥴtιvᥲr ᥱᥣ modo ρrιvᥲdo dᥱᥣ bot. 
+      const selfText = `ᥱᥣ modo sᥱᥣf ᥱs ρᥲrᥲ ᥲᥴtιvᥲr o dᥱsᥲᥴtιvᥲr ᥱᥣ modo ρrιvᥲdo dᥱᥣ jᥲdιbot ᥱstᥲbᥣᥱᥴᥱrᥣo ᥴomo ρúbᥣιᥴo o ρrιvᥲdo. 
 
-      
 ᥱstᥲdo ᥲᥴtυᥲᥣ: *${currentSelf.toUpperCase()}*
 
-${usedPrefix}ꜱᴇʟꜰ ᴏɴ
-${usedPrefix}ꜱᴇʟꜰ ᴏꜰꜰ
+${usedPrefix}sᥱᥣf oᥒ
+${usedPrefix}sᥱᥣf off
       `.trim()
 
       const previewUrl = 'https://tewianix.org'
