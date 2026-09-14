@@ -28,7 +28,7 @@ export default {
       getSubbotConfig(botJid)
 
     const botName =
-      botConfig?.botName ||
+      botConfig?.name ||
       'jᥲdιbot'
 
     const prefix =
