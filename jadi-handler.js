@@ -68,10 +68,6 @@ export async function loadSubbotPlugins() {
                     recursive: true
                 }
             )
-
-            console.log(
-                'Carpeta jadiplugins creada correctamente'
-            )
         }
 
         const files =
@@ -117,31 +113,15 @@ export async function loadSubbotPlugins() {
 
                 loaded++
 
-                console.log(
-                    `Plugin Jadibot cargado: ${pluginName}`
-                )
+            } catch {
 
-            } catch (error) {
-
-                console.error(
-                    `Error cargando plugin para Jadibot: ${file}`,
-                    error
-                )
+                continue
             }
         }
 
-        console.log(
-            `Plugins disponibles para Jadibots: ${loaded}`
-        )
-
         return loaded
 
-    } catch (error) {
-
-        console.error(
-            'Error cargando los plugins de Jadibots:',
-            error
-        )
+    } catch {
 
         return 0
     }
@@ -335,7 +315,7 @@ function normalizeMessage(
             }
         )
     }
-    
+
     m.send = async (
         content,
         options = {}
@@ -536,6 +516,83 @@ function parseCommand(
     }
 }
 
+function findNoPrefixPlugin(text) {
+
+    const cleanText =
+        String(text || '').trim()
+
+    if (!cleanText) {
+        return null
+    }
+
+    const parts =
+        cleanText.split(/\s+/)
+
+    const rawCommand =
+        parts.shift() || ''
+
+    const command =
+        rawCommand
+            .replace(
+                /^[^a-zA-Z0-9]+/,
+                ''
+            )
+            .toLowerCase()
+
+    if (!command) {
+        return null
+    }
+
+    for (
+        const [
+            ,
+            plugin
+        ]
+        of Object.entries(
+            global.jadiPlugins
+        )
+    ) {
+
+        if (
+            !plugin ||
+            plugin.disabled ||
+            !plugin.noPrefix ||
+            !plugin.command
+        ) {
+            continue
+        }
+
+        const commands =
+            Array.isArray(
+                plugin.command
+            )
+                ? plugin.command
+                : [plugin.command]
+
+        const found =
+            commands.some(
+                cmd =>
+                    String(cmd)
+                        .toLowerCase() ===
+                    command
+            )
+
+        if (!found) {
+            continue
+        }
+
+        return {
+            plugin,
+            command,
+            args: parts,
+            text: parts.join(' '),
+            usedPrefix: ''
+        }
+    }
+
+    return null
+}
+
 export default async function subbotHandler(
     conn,
     message
@@ -609,6 +666,11 @@ export default async function subbotHandler(
             selfMode === 'on'
         ) {
 
+            const noPrefixPlugin =
+                findNoPrefixPlugin(
+                    m.text
+                )
+
             const allowed =
                 canUseSelfMode(
                     m,
@@ -616,7 +678,10 @@ export default async function subbotHandler(
                     botConfig
                 )
 
-            if (!allowed) {
+            if (
+                !allowed &&
+                !noPrefixPlugin
+            ) {
                 return
             }
         }
@@ -650,12 +715,7 @@ export default async function subbotHandler(
                         used
                     )
 
-                } catch (error) {
-
-                    console.error(
-                        'Error en jadiPlugin.before:',
-                        error
-                    )
+                } catch {
                 }
             }
 
@@ -671,17 +731,55 @@ export default async function subbotHandler(
                         used
                     )
 
-                } catch (error) {
-
-                    console.error(
-                        'Error en jadiPlugin.all:',
-                        error
-                    )
+                } catch {
                 }
             }
         }
 
         if (!m.text) {
+            return
+        }
+
+        const noPrefixPlugin =
+            findNoPrefixPlugin(
+                m.text
+            )
+
+        if (noPrefixPlugin) {
+
+            used.args =
+                noPrefixPlugin.args
+
+            used.text =
+                noPrefixPlugin.text
+
+            used.command =
+                noPrefixPlugin.command
+
+            used.usedPrefix =
+                noPrefixPlugin.usedPrefix
+
+            used.prefix =
+                prefix
+
+            if (
+                noPrefixPlugin.plugin
+                    .onlyMainBot
+            ) {
+                return
+            }
+
+            if (
+                typeof noPrefixPlugin.plugin.run ===
+                'function'
+            ) {
+
+                await noPrefixPlugin.plugin.run(
+                    m,
+                    used
+                )
+            }
+
             return
         }
 
@@ -695,26 +793,21 @@ export default async function subbotHandler(
             return
         }
 
-
         const commandText =
             parsed.commandText
-
 
         const parts =
             commandText.split(
                 /\s+/
             )
 
-
         const command =
             parts
                 .shift()
                 .toLowerCase()
 
-
         const args =
             parts
-
 
         const textArgs =
             args.join(' ')
@@ -751,11 +844,13 @@ export default async function subbotHandler(
                 continue
             }
 
-
             if (!plugin.command) {
                 continue
             }
 
+            if (plugin.noPrefix) {
+                continue
+            }
 
             const commands =
                 Array.isArray(
@@ -764,7 +859,6 @@ export default async function subbotHandler(
                     ? plugin.command
                     : [plugin.command]
 
-
             const found =
                 commands.some(
                     cmd =>
@@ -772,7 +866,6 @@ export default async function subbotHandler(
                             .toLowerCase() ===
                         command
                 )
-
 
             if (!found) {
                 continue
@@ -798,11 +891,7 @@ export default async function subbotHandler(
             return
         }
 
-    } catch (error) {
-
-        console.error(
-            'Error en jadi-handler:',
-            error
-        )
+    } catch {
+        return
     }
 }
