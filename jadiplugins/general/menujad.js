@@ -309,6 +309,7 @@ export default {
             `hoᥣᥲ, *\`${nombre}\`* ${botEmoji}\n\n` +
             `ᥱstᥱ ᥱs ᥱᥣ mᥱᥒυ dᥱᥣ jᥲdιbot tᥱᥒdrᥲ.\n` +
             `dᥱsᥴᥲrgᥲs, bυsᥴᥲdor, jυᥱgos.\n\n` +
+            `ᥒotᥲ: sι oᥣvιdᥲstᥱ ᥱᥣ ρrᥱfιjo ᥱjᥱᥴυtᥲ *[ stᥲt }*\n\n` +
             `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
             `ᴘʀᴇꜰɪᴊᴏ: ${prefixDisplay}\n` +
             `ᴅᴇᴠ: *${ownerName}*\n` +
