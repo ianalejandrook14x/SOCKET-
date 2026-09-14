@@ -264,9 +264,9 @@ export default {
 
                 sizeInfo =
                     hd && sizeHd
-                        ? `${emoji} ━━ ᴘᴇꜱᴏ: ${sizeHd} (HD)\n`
+                        ? `${emoji} ━━ ρᥱso: ${sizeHd} (ʜᴅ)\n`
                         : sizeOrg
-                            ? `${emoji} ━━ ᴘᴇꜱᴏ: ${sizeOrg}\n`
+                            ? `${emoji} ━━ ρᥱso: ${sizeOrg}\n`
                             : ''
             }
 
