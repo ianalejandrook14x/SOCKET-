@@ -13,6 +13,26 @@ function getBotJid(conn) {
   )
 }
 
+function getRealBotName(conn, botConfig) {
+  const realName =
+    conn.user?.name ||
+    conn.user?.verifiedName ||
+    conn.user?.notify ||
+    ''
+
+  if (
+    typeof realName === 'string' &&
+    realName.trim()
+  ) {
+    return realName.trim()
+  }
+
+  return (
+    botConfig?.botName ||
+    'jᥲdιbot'
+  )
+}
+
 function formatUptime(startTime) {
   const elapsed = Date.now() - startTime
 
@@ -39,7 +59,10 @@ function formatUptime(startTime) {
     parts.push(`${remainingMinutes}m`)
   }
 
-  if (remainingSeconds > 0 || parts.length === 0) {
+  if (
+    remainingSeconds > 0 ||
+    parts.length === 0
+  ) {
     parts.push(`${remainingSeconds}s`)
   }
 
@@ -54,21 +77,30 @@ export default {
     const botJid = getBotJid(conn)
 
     if (!botJid) {
-      return m.reply('*No se pudo identificar el Jadibot.*')
+      return m.reply(
+        '*No se pudo identificar el Jadibot.*'
+      )
     }
 
     if (!subbotStartTimes.has(botJid)) {
-      subbotStartTimes.set(botJid, Date.now())
+      subbotStartTimes.set(
+        botJid,
+        Date.now()
+      )
     }
 
-    const botConfig = getSubbotConfig(botJid)
+    const botConfig =
+      getSubbotConfig(botJid)
 
     const botName =
-      botConfig?.botName ||
-      'jᥲdιbot'
+      getRealBotName(
+        conn,
+        botConfig
+      )
 
     const prefix =
-      botConfig?.prefix || 'Sin prefijo'
+      botConfig?.prefix ||
+      'Sin prefijo'
 
     const emoji =
       botConfig?.emoji ||
@@ -76,22 +108,25 @@ export default {
 
     const selfMode =
       botConfig?.self === 'on'
-        ? 'Privado'
-        : 'Público'
+        ? 'ρrιvᥲdo'
+        : 'ρυbᥣιᥴo'
 
-    const startTime = subbotStartTimes.get(botJid)
-    const uptime = formatUptime(startTime)
+    const startTime =
+      subbotStartTimes.get(botJid)
 
-    const statText = `ᴇꜱᴛᴀᴅɪꜱᴛɪᴄᴀꜱ ᴅᴇʟ ᴊᴀᴅɪʙᴏᴛ
+    const uptime =
+      formatUptime(startTime)
 
-Nombre: *${botName}*
-Prefijo: *${prefix}*
-Emoji: *${emoji}*
-Modo: *${selfMode}*
-Tiempo: *${uptime}*
-    `.trim()
+    const statText = `
+ᴇꜱᴛᴀᴅɪꜱᴛɪᴄᴀꜱ ᴅᴇʟ ᴊᴀᴅɪʙᴏᴛ
 
-    const previewUrl = 'https://tewianix.org'
+ᥒombrᥱ ρrᥱfιjo: *${botName}*
+ρrᥱfιjo: *${prefix}*
+ᥱmojι: *${emoji}*
+modo: *${selfMode}*`.trim()
+
+    const previewUrl =
+      'https://tewianix.org'
 
     const previewImage =
       botConfig?.mediaUrl ||
@@ -100,35 +135,43 @@ Tiempo: *${uptime}*
     let linkPreview
 
     try {
-      const imageResponse = await fetch(previewImage)
+      const imageResponse =
+        await fetch(previewImage)
 
       if (!imageResponse.ok) {
-        throw new Error(`Error HTTP ${imageResponse.status}`)
+        throw new Error(
+          `Error HTTP ${imageResponse.status}`
+        )
       }
 
-      const originalBuffer = Buffer.from(
-        await imageResponse.arrayBuffer()
-      )
+      const originalBuffer =
+        Buffer.from(
+          await imageResponse.arrayBuffer()
+        )
 
-      const thumbnailBuffer = await sharp(originalBuffer)
-        .resize(1280, 720, {
-          fit: 'cover',
-          position: 'center'
-        })
-        .jpeg({
-          quality: 90
-        })
-        .toBuffer()
+      const thumbnailBuffer =
+        await sharp(originalBuffer)
+          .resize(1280, 720, {
+            fit: 'cover',
+            position: 'center'
+          })
+          .jpeg({
+            quality: 90
+          })
+          .toBuffer()
 
-      const { imageMessage } = await prepareWAMessageMedia(
-        {
-          image: thumbnailBuffer
-        },
-        {
-          upload: conn.waUploadToServer,
-          mediaTypeOverride: 'thumbnail-link'
-        }
-      )
+      const { imageMessage } =
+        await prepareWAMessageMedia(
+          {
+            image: thumbnailBuffer
+          },
+          {
+            upload:
+              conn.waUploadToServer,
+            mediaTypeOverride:
+              'thumbnail-link'
+          }
+        )
 
       if (imageMessage) {
         imageMessage.width = 1280
@@ -136,30 +179,42 @@ Tiempo: *${uptime}*
       }
 
       linkPreview = {
-        'canonical-url': previewUrl,
-        'matched-text': previewUrl,
-        title: botName,
-        description: 'Estadisticas del Jadibot',
+        'canonical-url':
+          previewUrl,
+
+        'matched-text':
+          previewUrl,
+
+        title:
+          botName,
+
+        description:
+          'bყ ιᥲᥒᥲᥣᥱjᥲᥒdrook16x',
+
         previewType: 0,
-        jpegThumbnail: thumbnailBuffer,
-        highQualityThumbnail: imageMessage,
+
+        jpegThumbnail:
+          thumbnailBuffer,
+
+        highQualityThumbnail:
+          imageMessage,
+
         linkPreviewMetadata: {
           linkMediaDuration: 0,
           socialMediaPostType: 4
         }
       }
-    } catch (error) {
-      console.error(
-        '[STAT] Error generando link preview:',
-        error
-      )
+    } catch {
+      linkPreview = null
     }
 
     if (linkPreview) {
       return await conn.sendMessage(
         m.chat,
         {
-          text: `${previewUrl}\n\n${statText}`,
+          text:
+            `${previewUrl}\n\n${statText}`,
+
           linkPreview
         },
         {
