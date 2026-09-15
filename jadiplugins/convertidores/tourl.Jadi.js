@@ -5,7 +5,7 @@ import {
 } from '@itsliaaa/baileys'
 import {
     getSubbotConfig
-} from '../lib/subbotconfig.js'
+} from '../../lib/subbotconfig.js'
 import config from '../config.js'
 
 function getBotJid(conn) {
