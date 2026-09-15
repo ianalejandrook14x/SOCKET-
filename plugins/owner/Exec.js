@@ -1,7 +1,6 @@
 import util from 'util'
 import config from '../../config.js'
 import { createRequire } from 'module'
-import { compressVideo } from '../../lib/video.js'
 
 function extractPureNumber(target) {
     if (!target) return ''
@@ -63,9 +62,7 @@ export default {
                 'util',
                 'require',
                 'Buffer',
-                'console',
-                'compressVideo',
-                `
+                'console',                `
                 ${text}
                 `
             )
@@ -82,8 +79,7 @@ export default {
                 util,
                 require,
                 Buffer,
-                console,
-                compressVideo
+                console
             )
 
             if (
