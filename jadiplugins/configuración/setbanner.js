@@ -359,7 +359,8 @@ async function downloadImageFromUrl(
 export default {
     command: [
         'setbanner',
-        'setimage'
+        'setimage',
+        'banner'
     ],
 
     async run(
