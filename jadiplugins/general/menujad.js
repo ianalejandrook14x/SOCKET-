@@ -312,7 +312,6 @@ export default {
             `ᥒotᥲ: sι oᥣvιdᥲstᥱ ᥱᥣ ρrᥱfιjo ᥱjᥱᥴυtᥲ *[ stᥲt }*\n\n` +
             `ɴᴏᴍʙʀᴇ: *${botName}*\n` +
             `ᴘʀᴇꜰɪᴊᴏ: ${prefixDisplay}\n` +
-            `ᴅᴇᴠ: *${ownerName}*\n` +
             `ᴇᴍᴏᴊɪ: ${botEmoji}\n\n`
 
 
