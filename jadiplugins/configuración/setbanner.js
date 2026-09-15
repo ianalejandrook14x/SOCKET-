@@ -290,7 +290,7 @@ async function downloadImageFromUrl(
             new URL(url)
     } catch {
         throw new Error(
-            'La URL proporcionada no es válida.'
+            'ᥣᥲ υrᥣ ρroρorᥴιoᥒᥲdᥲ ᥒo ᥱs váᥣιdᥲ.'
         )
     }
 
@@ -299,7 +299,7 @@ async function downloadImageFromUrl(
         parsedUrl.protocol !== 'https:'
     ) {
         throw new Error(
-            'La URL debe utilizar HTTP o HTTPS.'
+            'ᥣᥲ υrᥣ dᥱbᥱ υtιᥣιzᥲr httρ o httρs.'
         )
     }
 
@@ -313,7 +313,7 @@ async function downloadImageFromUrl(
 
     if (!response.ok) {
         throw new Error(
-            `No se pudo descargar la imagen. HTTP ${response.status}.`
+            `ᥒo sᥱ ρυdo dᥱsᥴᥲrgᥲr ᥣᥲ ιmᥲgᥱᥒ. HTTP ${response.status}.`
         )
     }
 
@@ -333,7 +333,7 @@ async function downloadImageFromUrl(
         )
     ) {
         throw new Error(
-            '*La URL proporcionada no contiene una imagen.*'
+            '*ᥣᥲ υrᥣ ρroρorᥴιoᥒᥲdᥲ ᥒo ᥴoᥒtιᥱᥒᥱ υᥒᥲ ιmᥲgᥱᥒ.*'
         )
     }
 
@@ -345,7 +345,7 @@ async function downloadImageFromUrl(
 
     if (!buffer.length) {
         throw new Error(
-            'La imagen descargada está vacía.'
+            'ᥣᥲ ιmᥲgᥱᥒ dᥱsᥴᥲrgᥲdᥲ ᥱstá vᥲᥴíᥲ.'
         )
     }
 
@@ -412,7 +412,7 @@ export default {
             !quotedImage
         ) {
             return m.reply(
-                '*Responde a una imagen o una URL de una imagen.*'
+                '*rᥱsρoᥒdᥱ ᥲ υᥒᥲ ιmᥲgᥱᥒ o υᥒᥲ υrᥣ dᥱ υᥒᥲ ιmᥲgᥱᥒ.*'
             )
         }
 
@@ -449,7 +449,7 @@ export default {
 
             if (!imageBuffer?.length) {
                 throw new Error(
-                    'No se pudo obtener la imagen.'
+                    '*ᥒo sᥱ ρυdo obtᥱᥒᥱr ᥣᥲ ιmᥲgᥱᥒ.*'
                 )
             }
 
@@ -471,7 +471,7 @@ export default {
             )
 
             return m.reply(
-                `*ɪᴍᴀɢᴇɴ ᴀᴄᴛᴜᴀʟɪᴢᴀᴅᴀ*\n\n${catboxUrl}`
+                `*ᥣᥲ ιmᥲgᥱᥒ dᥱᥣ jᥲdιbot fυᥱ ᥲᥴtυᥲᥣιzᥲdᥲ.*`
             )
 
         } catch (error) {
@@ -482,7 +482,7 @@ export default {
             )
 
             return m.reply(
-                '*No se pudo actualizar la imagen.*'
+                '*ᥒo sᥱ ρυdo ᥲᥴtυᥲᥣιzᥲr ᥣᥲ ιmᥲgᥱᥒ.*'
             )
         }
     }
