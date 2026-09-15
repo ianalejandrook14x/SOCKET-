@@ -68,6 +68,7 @@ export default {
 
             const prefix =
                   botConfig?.prefix ||
+                  null
 
             let linkPreview = null
 
