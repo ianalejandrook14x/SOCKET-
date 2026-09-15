@@ -129,7 +129,7 @@ ${usedPrefix}sᥱᥣf off
       })
 
       return m.reply(
-        `*modo *sᥱᥣf* ᥲᥴtιvᥲdo*\n\nsᥱ ᥱstᥲbᥣᥱᥴιo ᥱᥣ modo ρrιvᥲdo.`
+        `*modo sᥱᥣf ᥲᥴtιvᥲdo*\n\nsᥱ ᥱstᥲbᥣᥱᥴιo ᥱᥣ modo ρrιvᥲdo.`
       )
     }
 
