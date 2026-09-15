@@ -1,5 +1,7 @@
 import fs from 'fs'
 import path from 'path'
+import sharp from 'sharp'
+import { prepareWAMessageMedia } from '@itsliaaa/baileys'
 import { initializeSubBot } from '../../lib/subbots.js'
 
 export default {
@@ -16,7 +18,6 @@ export default {
 
         const argumentos = args || []
 
-        // Detectar -me
         const myNumber = argumentos.some(
             arg => String(arg).toLowerCase() === '-me'
         )
@@ -58,73 +59,211 @@ export default {
         }
 
         if (!numero) {
-            return m.reply(
-                '\n\n*ɪɴɢʀᴇꜱᴀ ᴜɴ ɴᴜᴍᴇʀᴏ ᴅᴇ ᴛᴇʟᴇꜰᴏɴᴏ*\n> ᴏᴛʀᴏ | -ᴍᴇ\n\n'
+
+            const previewUrl =
+                'https://tewianix.org'
+
+            const previewImage =
+                'https://files.catbox.moe/fhnqaa.jpg'
+
+            const prefix =
+                  botConfig?.prefix ||
+
+            let linkPreview = null
+
+            try {
+
+                const imageResponse =
+                    await fetch(previewImage)
+
+                if (imageResponse.ok) {
+
+                    const originalBuffer =
+                        Buffer.from(
+                            await imageResponse.arrayBuffer()
+                        )
+
+                    const thumbnailBuffer =
+                        await sharp(originalBuffer)
+                            .resize(1280, 720, {
+                                fit: 'cover',
+                                position: 'center'
+                            })
+                            .jpeg({
+                                quality: 90
+                            })
+                            .toBuffer()
+
+                    const { imageMessage } =
+                        await prepareWAMessageMedia(
+                            {
+                                image: thumbnailBuffer
+                            },
+                            {
+                                upload:
+                                    conn.waUploadToServer,
+                                mediaTypeOverride:
+                                    'thumbnail-link'
+                            }
+                        )
+
+                    if (imageMessage) {
+                        imageMessage.width = 1280
+                        imageMessage.height = 720
+                    }
+
+                    linkPreview = {
+                        'canonical-url':
+                            previewUrl,
+
+                        'matched-text':
+                            previewUrl,
+
+                        title:
+                            'Jᴀᴅɪʙᴏᴛ',
+
+                        description:
+                            'ᴄᴏɴᴇᴄᴛᴀ ꜱᴏᴄᴋᴇᴛ',
+
+                        previewType:
+                            0,
+
+                        jpegThumbnail:
+                            thumbnailBuffer,
+
+                        highQualityThumbnail:
+                            imageMessage,
+
+                        linkPreviewMetadata: {
+                            linkMediaDuration:
+                                0,
+
+                            socialMediaPostType:
+                                4
+                        }
+                    }
+                }
+
+            } catch {}
+
+            return conn.sendMessage(
+                m.chat,
+                {
+                    text:
+                        `${previewUrl}\n\n` +
+                        `dᥱbᥱs ιᥒgrᥱsᥲr υᥒ ᥒυmᥱro dᥱ tᥱᥣᥱfoᥒo. ρᥱro sι qυιᥱrᥱs vιᥒᥴυᥣᥲr ᥱᥣ jᥲdιbot ρᥲrᥲ tυ ᥒυmᥱro ρoᥒ ᥣᥲ ρᥲᥣᥲbrᥲ *-mᥱ* sᥱgυιdᥲ dᥱᥣ ᥴomᥲᥒdo\n\n` +
+                        `*${prefix}jᥲdιbot +549387xxxxxxx*\n` +
+                        `*${prefix}jᥲdιbot -mᥱ*\n`,
+
+                    ...(linkPreview
+                        ? { linkPreview }
+                        : {})
+                },
+                {
+                    quoted: m
+                }
             )
         }
 
-        const jid = `${numero}@s.whatsapp.net`
+        const jid =
+            `${numero}@s.whatsapp.net`
 
-        let mensajeSat
-
-        try {
-            mensajeSat = await m.reply(
-                '*ꜱᴏʟɪᴄɪᴛᴀɴᴅᴏ ᴄᴏᴅɪɢᴏ -*'
-            )
-        } catch (e) {
-            console.error('Error enviando mensaje inicial:', e)
-        }
+        let mensajeSat = null
 
         try {
 
-            const safeJid = String(jid)
-                .replace(/[^a-zA-Z0-9_-]/g, '_')
+            mensajeSat =
+                await m.reply(
+                    '*ꜱᴏʟɪᴄɪᴛᴀɴᴅᴏ ᴄᴏᴅɪɢᴏ -*'
+                )
 
-            const subbotFolder = path.join(
-                process.cwd(),
-                'database',
-                'subbots',
-                safeJid
-            )
+        } catch {}
+
+        try {
+
+            const safeJid =
+                String(jid)
+                    .replace(
+                        /[^a-zA-Z0-9_-]/g,
+                        '_'
+                    )
+
+            const subbotFolder =
+                path.join(
+                    process.cwd(),
+                    'database',
+                    'subbots',
+                    safeJid
+                )
 
             if (fs.existsSync(subbotFolder)) {
+
                 try {
-                    fs.rmSync(subbotFolder, {
-                        recursive: true,
-                        force: true
-                    })
-                } catch (e) {
-                    console.error(
-                        'Error limpiando carpeta vieja:',
-                        e
+
+                    fs.rmSync(
+                        subbotFolder,
+                        {
+                            recursive: true,
+                            force: true
+                        }
                     )
-                }
+
+                } catch {}
             }
 
-            const result = await initializeSubBot(
-                jid,
-                {
-                    generatePairingCode: true,
-                    phoneNumber: numero,
-                    subbotOwner: m.sender
-                }
-            )
+            const result =
+                await initializeSubBot(
+                    jid,
+                    {
+                        generatePairingCode:
+                            true,
 
-            if (!result || !result.pairingCode) {
+                        phoneNumber:
+                            numero,
+
+                        subbotOwner:
+                            m.sender
+                    }
+                )
+
+            if (
+                !result ||
+                !result.pairingCode
+            ) {
 
                 const errorText =
                     '*ᥒo sᥱ ρυdo gᥱᥒᥱrᥲr ᥱᥣ ᥴodιgo, ιᥒtᥱᥒtᥲ dᥱ ᥒυᥱvo ᥱᥒ υᥒos sᥱgυᥒdos*'
 
-                try {
-                    if (mensajeSat?.edit) {
-                        await mensajeSat.edit(errorText)
-                    } else if (m.edit) {
-                        await m.edit(errorText)
-                    } else {
-                        await m.reply(errorText)
-                    }
-                } catch (e) {
-                    await m.reply(errorText)
+                if (
+                    mensajeSat &&
+                    typeof mensajeSat.edit ===
+                        'function'
+                ) {
+
+                    await mensajeSat.edit(
+                        errorText
+                    )
+
+                } else if (
+                    mensajeSat?.key
+                ) {
+
+                    await conn.sendMessage(
+                        m.chat,
+                        {
+                            text: errorText
+                        },
+                        {
+                            edit:
+                                mensajeSat.key
+                        }
+                    )
+
+                } else {
+
+                    await m.reply(
+                        errorText
+                    )
                 }
 
                 return
@@ -133,53 +272,73 @@ export default {
             const codigoText =
                 `${result.pairingCode}`
 
-            try {
+            if (
+                mensajeSat &&
+                typeof mensajeSat.edit ===
+                    'function'
+            ) {
 
-                if (mensajeSat?.edit) {
-                    await mensajeSat.edit(codigoText)
-
-                } else if (typeof m.edit === 'function') {
-                    await m.edit(codigoText)
-
-                } else {
-                    await m.reply(codigoText)
-                }
-
-            } catch (editError) {
-
-                console.error(
-                    'Error editando mensaje:',
-                    editError
+                await mensajeSat.edit(
+                    codigoText
                 )
 
-                await m.reply(codigoText)
+            } else if (
+                mensajeSat?.key
+            ) {
+
+                await conn.sendMessage(
+                    m.chat,
+                    {
+                        text: codigoText
+                    },
+                    {
+                        edit:
+                            mensajeSat.key
+                    }
+                )
+
             }
 
-        } catch (error) {
-
-            console.error(
-                'Error en code:',
-                error
-            )
+        } catch {
 
             const errorText =
                 '*Error al generar código.*'
 
             try {
 
-                if (mensajeSat?.edit) {
-                    await mensajeSat.edit(errorText)
+                if (
+                    mensajeSat &&
+                    typeof mensajeSat.edit ===
+                        'function'
+                ) {
 
-                } else if (typeof m.edit === 'function') {
-                    await m.edit(errorText)
+                    await mensajeSat.edit(
+                        errorText
+                    )
+
+                } else if (
+                    mensajeSat?.key
+                ) {
+
+                    await conn.sendMessage(
+                        m.chat,
+                        {
+                            text: errorText
+                        },
+                        {
+                            edit:
+                                mensajeSat.key
+                        }
+                    )
 
                 } else {
-                    await m.reply(errorText)
+
+                    await m.reply(
+                        errorText
+                    )
                 }
 
-            } catch (e) {
-                await m.reply(errorText)
-            }
+            } catch {}
         }
     }
 }
