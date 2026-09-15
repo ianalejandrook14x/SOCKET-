@@ -66,10 +66,6 @@ export default {
             const previewImage =
                 'https://files.catbox.moe/fhnqaa.jpg'
 
-            const prefix =
-                  botConfig?.prefix ||
-                  null
-
             let linkPreview = null
 
             try {
@@ -124,7 +120,7 @@ export default {
                             'Jᴀᴅɪʙᴏᴛ',
 
                         description:
-                            'ᴄᴏɴᴇᴄᴛᴀ ꜱᴏᴄᴋᴇᴛ',
+                            'Crea tu propio Jadibot.',
 
                         previewType:
                             0,
@@ -152,9 +148,8 @@ export default {
                 {
                     text:
                         `${previewUrl}\n\n` +
-                        `dᥱbᥱs ιᥒgrᥱsᥲr υᥒ ᥒυmᥱro dᥱ tᥱᥣᥱfoᥒo. ρᥱro sι qυιᥱrᥱs vιᥒᥴυᥣᥲr ᥱᥣ jᥲdιbot ρᥲrᥲ tυ ᥒυmᥱro ρoᥒ ᥣᥲ ρᥲᥣᥲbrᥲ *-mᥱ* sᥱgυιdᥲ dᥱᥣ ᥴomᥲᥒdo\n\n` +
-                        `*${prefix}jᥲdιbot +549387xxxxxxx*\n` +
-                        `*${prefix}jᥲdιbot -mᥱ*\n`,
+                        `dᥱbᥱs ιᥒgrᥱsᥲr υᥒ ᥒúmᥱro ρᥲrᥲ obtᥱᥒᥱr ᥱᥣ ᥴodιgo dᥱ vιᥒᥴυᥣᥲᥴιóᥒ o υtιᥣιzᥲᥒdo *-mᥱ* sᥱgυιdo dᥱᥣ ᥴomᥲᥒdo\nᥱjᥱmρᥣo:\n\n` +
+                        `*jᥲdιbot +549387xxxxxxx*\n*jᥲdιbot -mᥱ*`,
 
                     ...(linkPreview
                         ? { linkPreview }
