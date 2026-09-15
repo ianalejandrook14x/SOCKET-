@@ -120,7 +120,7 @@ export default {
                             'Jᴀᴅɪʙᴏᴛ',
 
                         description:
-                            'Crea tu propio Jadibot.',
+                            'ᴄᴏɴᴇᴄᴛᴀ ᴛᴜ ᴘʀᴏᴘɪᴏ ꜱᴏᴄᴋᴇᴛ',
 
                         previewType:
                             0,
