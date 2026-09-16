@@ -477,8 +477,7 @@ ${prefix}toυrᥣ [υrᥣ]`
 
             const successText =
                 `*ᥣᥲ ιmᥲgᥱn yᥲ fυᥱ sυbιdᥲ.* ${emoji}
-
-ᥱstᥲ ᥱs ᥣᥲ URL: ${catboxUrl}`
+*URL: ${catboxUrl}*`
 
             const linkPreview =
                 await createLinkPreview(
