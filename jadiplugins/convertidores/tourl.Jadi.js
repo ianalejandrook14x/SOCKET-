@@ -130,7 +130,7 @@ async function downloadImageFromUrl(url) {
         parsedUrl = new URL(url)
     } catch {
         throw new Error(
-            'La URL proporcionada no es válida.'
+            '*La URL proporcionada no es válida.*'
         )
     }
 
@@ -139,7 +139,7 @@ async function downloadImageFromUrl(url) {
         parsedUrl.protocol !== 'https:'
     ) {
         throw new Error(
-            'La URL debe utilizar HTTP o HTTPS.'
+            '*La URL debe utilizar HTTP o HTTPS*'
         )
     }
 
@@ -150,7 +150,7 @@ async function downloadImageFromUrl(url) {
 
     if (!response.ok) {
         throw new Error(
-            `No se pudo descargar la imagen. HTTP ${response.status}.`
+            `*No se pudo descargar la imagen. HTTP ${response.status}.*`
         )
     }
 
@@ -168,7 +168,7 @@ async function downloadImageFromUrl(url) {
         !contentType.startsWith('image/')
     ) {
         throw new Error(
-            'La URL proporcionada no contiene una imagen.'
+            '*La URL proporcionada no contiene una imagen.*'
         )
     }
 
@@ -405,18 +405,18 @@ export default {
             const usageText =
                 `*υso ιncorrecтo del comando* ${emoji}
 
-ᥣos modos disponibles son:
+ᥣos modos dιsρoᥒιbᥣᥱs soᥒ:
 
-${prefix}tourl [Responde a una imagen]
+${prefix}toυrᥣ [rᥱsρoᥒdᥱ ᥲ υᥒᥲ ιmᥲgᥱᥒ]
 
-${prefix}tourl [URL]`
+${prefix}toυrᥣ [υrᥣ]`
 
             const linkPreview =
                 await createLinkPreview(
                     conn,
                     botImage,
-                    'TᴏUʀʟ',
-                    `Convierte imágenes en URL. ${emoji}`
+                    'toυrᥣ',
+                    `sυbιr ᥲrᥴhιvos ᥲ υrᥣ. ${emoji}`
                 )
 
             if (linkPreview) {
@@ -480,16 +480,14 @@ ${prefix}tourl [URL]`
             const successText =
                 `*ᥣᥲ ιmᥲgᥱn yᥲ fυᥱ sυbιdᥲ.* ${emoji}
 
-ᥱstᥲ ᥱs ᥣᥲ URL:
-
-${catboxUrl}`
+ᥱstᥲ ᥱs ᥣᥲ URL: ${catboxUrl}`
 
             const linkPreview =
                 await createLinkPreview(
                     conn,
                     catboxUrl,
                     'Iᴍᴀɢᴇɴ sᴜʙɪᴅᴀ',
-                    `Imagen convertida a URL. ${emoji}`
+                    `ɪᴍᴀɢᴇɴ ᴄᴏɴᴠᴇʀᴛɪᴅᴀ ᴇɴ ᴜʀʟ. ${emoji}`
                 )
 
             if (linkPreview) {
@@ -519,7 +517,7 @@ ${catboxUrl}`
             )
 
             return m.reply(
-                '*No se pudo convertir la imagen en URL.*'
+                '*ɴᴏ ꜱᴇ ᴘᴜᴅᴏ ᴄᴏɴᴠᴇʀᴛɪʀ ʟᴀ ɪᴍᴀɢᴇɴ.*'
             )
         }
     }
