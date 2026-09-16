@@ -404,11 +404,9 @@ export default {
 
             const usageText =
                 `*υso ιncorrecтo del comando* ${emoji}
-
 ᥣos modos dιsρoᥒιbᥣᥱs soᥒ:
 
 ${prefix}toυrᥣ [rᥱsρoᥒdᥱ ᥲ υᥒᥲ ιmᥲgᥱᥒ]
-
 ${prefix}toυrᥣ [υrᥣ]`
 
             const linkPreview =
