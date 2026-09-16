@@ -495,7 +495,7 @@ ${prefix}toυrᥣ [υrᥣ]`
                     m.chat,
                     {
                         text:
-                            `${catboxUrl}\n\n${successText}`,
+                            `\n${successText}`,
 
                         linkPreview
                     },
