@@ -6,7 +6,7 @@ import {
 import {
     getSubbotConfig
 } from '../../lib/subbotconfig.js'
-import config from './config.js'
+import config from '../../config.js'
 
 function getBotJid(conn) {
     return (
